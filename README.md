@@ -86,18 +86,15 @@ pnpx skills update
 
 Установка MCP и деплой приложения [calendar-slot](https://calendar-slot.onrender.com/).
 
-После того, как сделал DockerFile начали штатно отрабатываться проверки от hexlet_check.
+Ключ RENDER_API_KEY храним в переменных окружения.
 
-```bash
-# Чтение переменных окружения из .envrc в PowerShell
-Install-Module -Name posh-direnv
-```
+После того, как сделал DockerFile начали штатно отрабатываться проверки от hexlet_check.
 
 Используемые конфигурационные файлы:
 
 ```bash
-# ключ для деплоя и Render MCP — переменная окружения RENDER_API_KEY
-# (задаётся в .envrc; файл исключён в .gitignore)
+# RENDER_API_KEY - локально в переменных окружения
+# CI - ключи из secrets.RENDER_API_KEY
 opencode.json
 Dockerfile
 nginx.conf.template
