@@ -88,11 +88,16 @@ pnpx skills update
 
 После того, как сделал DockerFile начали штатно отрабатываться проверки от hexlet_check.
 
+```bash
+# Чтение переменных окружения из .envrc в PowerShell
+Install-Module -Name posh-direnv
+```
+
 Используемые конфигурационные файлы:
 
 ```bash
-# секрет, исключён в .gitignore; ключ для деплоя и Render MCP
-.secrets/render-api-key
+# ключ для деплоя и Render MCP — переменная окружения RENDER_API_KEY
+# (задаётся в .envrc; файл исключён в .gitignore)
 opencode.json
 Dockerfile
 nginx.conf.template

@@ -18,7 +18,7 @@
         "url": "https://mcp.render.com/mcp",
         "oauth": false,
         "headers": {
-          "Authorization": "Bearer {file:.secrets/render-api-key}"
+          "Authorization": "Bearer {env:RENDER_API_KEY}"
         }
       }
     }

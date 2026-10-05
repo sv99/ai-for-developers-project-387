@@ -24,7 +24,7 @@
 `opencode.json` (в корне, **коммитится**) описывает два MCP-сервера:
 
 - `playwright` — локальный, только для этого проекта;
-- `render` — remote (`https://mcp.render.com/mcp`), ключ подставляется из `.secrets/render-api-key` через `{file:…}`. Сам файл секрета в `.secrets/` и **не коммитится** — на новой машине создай его (`printf '%s' rnd_… > .secrets/render-api-key`), иначе Render MCP вернёт `unauthorized`. Тот же ключ читает `scripts/deploy.mjs` из `RENDER_API_KEY`. В CI (`opencode.yml`) Render MCP отключается шагом `jq`, поэтому секрет там не нужен.
+- `render` — remote (`https://mcp.render.com/mcp`), ключ подставляется из переменной окружения `RENDER_API_KEY` через `{env:…}`. На новой машине задай `RENDER_API_KEY=rnd_…` (например, в `.envrc` для direnv; файл **не коммитится**), иначе Render MCP вернёт `unauthorized`. Тот же ключ читает `scripts/deploy.mjs` из `RENDER_API_KEY`. В CI (`opencode.yml`) Render MCP отключается шагом `jq`, поэтому секрет там не нужен.
 
 ## Стиль кода
 
