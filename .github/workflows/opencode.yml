@@ -26,18 +26,18 @@ jobs:
           persist-credentials: false
 
       # - name: Drop local-only MCP servers
-        # Отключаем Render MCP читает ключ из переменной окружения RENDER_API_KEY, которой в CI нет:
-        # без этого шага opencode.json невалиден и агент не стартует.
-        # skip-worktree скрывает правку от git, иначе opencode-экшен закоммитит
-        # её в свой PR.
-        # run: |
-        #   jq 'del(.mcp.servers.render)' opencode.json > opencode.tmp.json
-        #   mv opencode.tmp.json opencode.json
-        #   git update-index --skip-worktree opencode.json
+      #   Отключаем Render MCP читает ключ из переменной окружения RENDER_API_KEY, которой в CI нет:
+      #   без этого шага opencode.json невалиден и агент не стартует.
+      #   skip-worktree скрывает правку от git, иначе opencode-экшен закоммитит её в свой PR.
+      #   run: |
+      #     jq 'del(.mcp.servers.render)' opencode.json > opencode.tmp.json
+      #     mv opencode.tmp.json opencode.json
+      #     git update-index --skip-worktree opencode.json
 
       - name: Run opencode
         uses: anomalyco/opencode/github@latest
-        env:
+        env:          
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         with:
           model: opencode/glm-5.3-flash
