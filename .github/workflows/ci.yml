@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  smoke:
+    name: Smoke test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Smoke test (app starts and responds)
+        run: |
+          pnpm preview --port 4173 --strictPort &
+          server_pid=$!
+          trap 'kill $server_pid 2>/dev/null || true' EXIT
+
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:4173/ -o page.html; then
+              grep -q 'id="app"' page.html
+              echo "Smoke test passed: app is up and responds"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Smoke test failed: app did not respond within 30s"
+          exit 1

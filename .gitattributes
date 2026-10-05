@@ -1,0 +1,26 @@
+# Совместная работа Windows + WSL на одном рабочем дереве (репозиторий на /mnt/d).
+# Оба git-клиента обращаются к одним и тем же файлам, поэтому переводы строк
+# принудительно нормализуются к LF и в репозитории, и в рабочей копии — на любой ОС.
+* text=auto eol=lf
+
+# Windows-скрипты традиционно используют CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Явно помечаем бинарные типы (на случай ложного определения text=auto).
+*.ico   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.avif  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.pdf   binary
+*.zip   binary
+*.xlsx  binary
+*.docx  binary
