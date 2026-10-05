@@ -1,6 +1,6 @@
 # Календарь звонков (продолжение)
 
-[![hexlet-check](https://github.com/sv99/ai-for-developers-project-386/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/sv99/ai-for-developers-project-386/actions)
+[![hexlet-check](https://github.com/sv99/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/sv99/ai-for-developers-project-387/actions)
 
 Разработайте совместно с ИИ сервис для бронирования календаря
 
@@ -20,8 +20,8 @@
 ## Установка release-please
 
 ```bash
-git clone https://github.com/sv99/ai-for-developers-project-386.git
-cd ai-for-developers-project-386
+git clone https://github.com/sv99/ai-for-developers-project-387.git
+cd ai-for-developers-project-387
 ```
 
 Для работы `release-please` нужно:
