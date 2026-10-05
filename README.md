@@ -91,7 +91,8 @@ pnpx skills update
 Используемые конфигурационные файлы:
 
 ```bash
-# исключен в .gitignore, содержит ключ для деплоя
+# секрет, исключён в .gitignore; ключ для деплоя и Render MCP
+.secrets/render-api-key
 opencode.json
 Dockerfile
 nginx.conf.template
