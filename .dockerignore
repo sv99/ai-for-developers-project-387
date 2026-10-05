@@ -1,0 +1,41 @@
+# Dependencies and build output (rebuilt inside the image)
+node_modules
+dist
+dist-ssr
+coverage
+
+# Version control and CI
+.git
+.gitignore
+.github
+
+# Editor and OS files
+.vscode
+.idea
+.DS_Store
+*.sw?
+
+# Tooling caches
+*.tsbuildinfo
+.eslintcache
+.playwright-mcp
+
+# Local secrets and machine-specific config (never bake these into an image)
+opencode.json
+.secrets
+.env
+.env.*
+
+# Docs and non-runtime assets
+docs
+.agents
+skills-lock.json
+typespec
+README.md
+README_SETUP.md
+CHANGELOG.md
+AGENTS.md
+GLOSSARY.md
+
+# Logs
+*.log

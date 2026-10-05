@@ -1,0 +1,32 @@
+@import './base.css';
+
+/*
+ * Тема проекта: оранжевый акцент вместо синего по умолчанию Element Plus.
+ * Селектор удвоен (`:root:root`) намеренно: Element Plus объявляет те же переменные
+ * на `:root` в theme-chalk/base.css, а его стили подключаются вместе с компонентами —
+ * то есть после наших. Удвоение даёт специфичность выше независимо от порядка.
+ */
+:root:root {
+  --el-color-primary: #ff7a29;
+  --el-color-primary-rgb: 255, 122, 41;
+  --el-color-primary-light-3: #ffa76a;
+  --el-color-primary-light-5: #ffbc8f;
+  --el-color-primary-light-7: #ffd1b3;
+  --el-color-primary-light-8: #ffdcc4;
+  --el-color-primary-light-9: #fff2e9;
+  --el-color-primary-dark-2: #d95f14;
+}
+
+/* Единая ширина контента для шапки и страниц: боковые отступы задаёт «оболочка»
+ * (.app-header / .page), а .app-container центрирует и ограничивает ширину. */
+:root {
+  --app-header-height: 64px;
+  --app-content-width: 1120px;
+  --app-gutter: 24px;
+}
+
+.app-container {
+  width: 100%;
+  max-width: var(--app-content-width);
+  margin-inline: auto;
+}

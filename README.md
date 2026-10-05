@@ -1,39 +1,100 @@
 # Календарь звонков (продолжение)
 
-
 [![hexlet-check](https://github.com/sv99/ai-for-developers-project-387/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/sv99/ai-for-developers-project-387/actions)
 
-Интегрируйте работу агентов в GitHub проект
+Разработайте совместно с ИИ сервис для бронирования календаря
 
-Учебный проект Хекслета: https://ru.hexlet.io/programs/ai-for-developers
-Как это должно работать: https://files.hexlet.app/a/2ipc5m
+Учебный проект Хекслета: <https://ru.hexlet.io/programs/ai-for-developers>
+Как это должно работать: <https://files.hexlet.app/a/2ipc5m>
 
 ## Стек
 
-- Разное
+- TypeScript
+- Vue
+- Element-Plus
+- Vite
 
-## Установка
+Большую часть настройки сделал opencode модель GLM 5.3.
+Отдельно настраивал release-please (раньше никогда не сталкивался), тоже под руководством Copilot в их новом варианте интерфейса Agents.
 
-<!-- Опишите установку: клонирование, зависимости, переменные окружения -->
+## Установка release-please
 
 ```bash
 git clone https://github.com/sv99/ai-for-developers-project-387.git
 cd ai-for-developers-project-387
 ```
 
-## Использование
+Для работы `release-please` нужно:
 
-<!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
+1. добавить PAT ключ для репозитория с правами: Contents: Read and write, Pull requests: Read and write.
+2. Добавить его в репозиторий как secret Settings → Secrets and variables → Actions → New repository secret с именем RELEASE_PLEASE_TOKEN.
 
----
+## init
 
-<details>
-<summary>Автоматические тесты Хекслета</summary>
+Инициализация проекта для работы с агентом.
 
-Тесты запускаются на каждый коммит. За запуск отвечает файл `.github/workflows/hexlet-check.yml` — не удаляйте и не переименовывайте ни его, ни репозиторий.
+```bash
+/init
+```
 
-</details>
+## Установка Skills
 
-## О Хекслете
+1. Установите набор скиллов:
 
-[Хекслет](https://ru.hexlet.io/) — школа программирования: авторские программы обучения с практикой, поддержкой наставников и реальными проектами, которые остаются в резюме. Этот репозиторий — один из таких проектов.
+```bash
+# Install
+npx skills@latest add mattpocock/skills
+# Update
+pnpx skills update
+```
+
+1. Проверьте, что агент видит скиллы: они должны появиться в списке доступных.
+2. Запустите /setup-matt-pocock-skills
+
+ответы на вопросы:
+
+- трекер задач: GitHub Issues в репозитории проекта;
+- метки для разбора задач: оставить значения по умолчанию;
+- документы предметной области: один контекст, GLOSSARY.md и docs/adr/ в корне репозитория
+
+1. Посмотрите, что скилл записал в docs/agents/ и в AGENTS.md.
+
+## Главная страница
+
+Я сделал ее раньше.
+
+```bash
+Запускал @grill-with-docs Главная страница сервиса "Календарь звонков" открывается и ведёт на страницу записи.
+```
+
+Ответы на вопросы в несколько этапов. Использовл GLM-5.3 сжег 3$.
+
+Для @wayfinder "утверждённая спецификация приложения, по которой можно раскладывать тикеты" использовал GLM-5.3-flash. Ушло намного меньше денег.
+
+## Работа с issues
+
+Для работы с ними попробовал GLM-5.3-flash и DeepSeek V4.1 Flash - разницы не заметил.
+
+Поэтапная реализация страниц на основе скриншотов со страницы описания проекта.
+
+## OpenSpec
+
+Спецификация сгенерировал по уже готовому API слою.
+К его качеству есть вопросы. Пока не понятно как это должно (желательно) работать.
+
+## Deploy в Render
+
+Установка MCP и деплой приложения [calendar-slot](https://calendar-slot.onrender.com/).
+
+После того, как сделал DockerFile начали штатно отрабатываться проверки от hexlet_check.
+
+Используемые конфигурационные файлы:
+
+```bash
+# исключен в .gitignore, содержит ключ для деплоя
+opencode.json
+Dockerfile
+nginx.conf.template
+# используется для настройки сервиса в Render
+render.yaml
+```

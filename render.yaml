@@ -1,0 +1,10 @@
+# Render Blueprint: creates the web service that runs the Docker image.
+# Dashboard → New → Blueprint → select this repository.
+services:
+  - type: web
+    name: calendar-slot
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /
+    autoDeploy: true

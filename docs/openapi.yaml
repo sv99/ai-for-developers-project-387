@@ -1,0 +1,460 @@
+openapi: 3.0.0
+info:
+  title: Календарь звонков
+  version: 0.0.0
+tags: []
+paths:
+  /booking-window-end:
+    get:
+      operationId: bookingWindowEnd
+      description: |-
+        Последний день окна регистрации, `YYYY-MM-DD`: сегодня + 14 дней.
+        Соответствует `bookingWindowEnd`.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/BookingWindowEnd'
+                  - $ref: '#/components/schemas/ApiError'
+  /bookings:
+    get:
+      operationId: listBookings
+      description: Все Записи, включая отменённые и прошедшие. Соответствует `listBookings`.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Booking'
+                  - $ref: '#/components/schemas/ApiError'
+    post:
+      operationId: createBooking
+      description: |-
+        Создаёт Запись. Ошибки: неизвестный Тип события, пустая дата, время вне сетки,
+        событие не помещается до 18:00, пустой контакт и пересечение с активной Записью.
+        Соответствует `createBooking`.
+      parameters: []
+      responses:
+        '201':
+          description: Обёртка успешного создания Записи с кодом 201.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '409':
+          description: Обёртка конфликта Записи с кодом 409.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingInput'
+  /bookings/upcoming:
+    get:
+      operationId: listUpcomingBookings
+      description: |-
+        Предстоящие Записи владельца: активные, начало которых ещё не прошло, в порядке
+        времени начала. Соответствует `listUpcomingBookings`.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Booking'
+                  - $ref: '#/components/schemas/ApiError'
+  /bookings/{id}/cancel:
+    post:
+      operationId: cancelBooking
+      description: |-
+        Отменяет Запись: статус становится `cancelled`, время снова свободно, тело Записи
+        сохраняется. Ошибки: «Запись не найдена», «Запись уже отменена». Соответствует
+        `cancelBooking`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/NotFoundError'
+                  - $ref: '#/components/schemas/ValidationError'
+  /event-types:
+    get:
+      operationId: listEventTypes
+      description: Все Типы событий. Соответствует `listEventTypes`.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/EventType'
+                  - $ref: '#/components/schemas/ApiError'
+    post:
+      operationId: createEventType
+      description: |-
+        Создаёт Тип события. Ошибки: пустое название, длительность не целое или меньше 1.
+        Соответствует `createEventType`.
+      parameters: []
+      responses:
+        '201':
+          description: Обёртка создания Типа события с кодом 201.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+        '400':
+          description: Обёртка ошибки валидации Типа события с кодом 400.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventTypeInput'
+  /health:
+    get:
+      operationId: health
+      description: |-
+        Проверка состояния. Служебный эндпоинт, в v1 нет аналога в `src/api`;
+        добавлен, чтобы у сервиса была хотя бы одна операция без ошибок.
+      parameters: []
+      responses:
+        '200':
+          description: Успешный ответ `health` — в доменной модели аналога нет.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthOk'
+  /settings/calendar-name:
+    get:
+      operationId: getCalendarName
+      description: Имя календаря; по умолчанию «Владелец». Соответствует `getCalendarName`.
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/CalendarName'
+                  - $ref: '#/components/schemas/ApiError'
+    put:
+      operationId: setCalendarName
+      description: Сохраняет имя календаря; при пустом имени ошибка. Соответствует `setCalendarName`.
+      parameters: []
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalendarName'
+  /slots:
+    get:
+      operationId: listDaySlots
+      description: |-
+        Слоты дня со статусами (`listDaySlots`). За окном регистрации (сегодня + 14 дней)
+        и в прошлом все Слоты `taken`.
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/DaySlot'
+                  - $ref: '#/components/schemas/ApiError'
+  /slots/free-count:
+    get:
+      operationId: countFreeSlots
+      description: Число свободных Слотов дня, 0 … 18. Соответствует `countFreeSlots`.
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/FreeSlotsCount'
+                  - $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    ApiError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+      description: 'Ошибка операции: сообщение на русском, которое UI показывает как есть.'
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - date
+        - startTime
+        - contact
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Системный идентификатор, генерирует `generateId`.
+        eventTypeId:
+          type: string
+          description: Идентификатор Типа события; ссылается на `EventType.id`.
+        date:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+          description: Дата Записи, `YYYY-MM-DD` в локальном времени браузера.
+        startTime:
+          type: string
+          description: Время начала, `HH:mm` из сетки 30 минут в окне 09:00–18:00.
+        contact:
+          $ref: '#/components/schemas/Contact'
+        status:
+          $ref: '#/components/schemas/BookingStatus'
+        createdAt:
+          type: string
+          description: Момент создания Записи, ISO 8601.
+      description: |-
+        Запись — забронированный звонок: закреплён за Типом события, временем начала и контактом.
+        Занимает столько подряд идущих Слотов, сколько требует длительность её Типа события.
+    BookingInput:
+      type: object
+      required:
+        - eventTypeId
+        - date
+        - startTime
+        - contact
+      properties:
+        eventTypeId:
+          type: string
+        date:
+          type: string
+          pattern: ^\d{4}-\d{2}-\d{2}$
+        startTime:
+          type: string
+        contact:
+          $ref: '#/components/schemas/Contact'
+      description: 'Данные для бронирования: тип события, время начала и контакт (`createBooking`).'
+    BookingStatus:
+      type: string
+      enum:
+        - active
+        - cancelled
+      description: Статус Записи.
+    BookingWindowEnd:
+      type: object
+      required:
+        - date
+      properties:
+        date:
+          type: string
+      description: Последний день окна регистрации как тело ответа.
+    CalendarName:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+      description: Имя календаря — настройка владельца; по умолчанию «Владелец» (`getCalendarName`).
+    ConflictError:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+      description: 'Время уже занято активной Записью: «Это время уже занято. Выберите другое время.»'
+    Contact:
+      type: object
+      required:
+        - name
+        - phone
+      properties:
+        name:
+          type: string
+          minLength: 1
+        phone:
+          type: string
+          minLength: 1
+      description: Контакт посетителя, оставленный при Записи.
+    DaySlot:
+      type: object
+      required:
+        - startTime
+        - endTime
+        - status
+      properties:
+        startTime:
+          type: string
+          description: 'Время начала Слота, `HH:mm`, кратно 30 минутам: 09:00 … 17:30.'
+        endTime:
+          type: string
+          description: 'Время конца Слота, `HH:mm`: 09:30 … 18:00.'
+        status:
+          allOf:
+            - $ref: '#/components/schemas/SlotStatus'
+          description: |-
+            Статус Слота. `taken` покрывает три случая: Слот занят активной Записью,
+            его начало уже прошло или день вне окна регистрации.
+      description: |-
+        Слот — единица занятости дня: 30-минутный интервал в окне 09:00–18:00.
+        Слоты не хранятся, а выводятся из расписания минус активные Записи (`listDaySlots`).
+    EventType:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - durationMinutes
+      properties:
+        id:
+          type: string
+          description: Системный идентификатор, генерирует `generateId`.
+        name:
+          type: string
+          description: Название вида звонка.
+        description:
+          type: string
+          description: Описание для посетителя; может быть пустым.
+        durationMinutes:
+          type: integer
+          format: int32
+          minimum: 1
+          description: Длительность в минутах, целое число не меньше 1.
+      description: |-
+        Тип события — вид звонка, который владелец календаря предлагает посетителям.
+        Длительность определяет, сколько Слотов занимает Запись (30 мин — один, 60 мин — два).
+    EventTypeInput:
+      type: object
+      required:
+        - name
+        - description
+        - durationMinutes
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+          minimum: 1
+      description: Данные для создания Типа события — всё, кроме системного идентификатора (`createEventType`).
+    FreeSlotsCount:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          format: int32
+      description: Количество свободных Слотов дня как тело ответа, а не голое число.
+    HealthOk:
+      type: object
+      required:
+        - ok
+      properties:
+        ok:
+          type: boolean
+          enum:
+            - true
+      description: Успешный ответ `health` — в доменной модели аналога нет.
+    NotFoundError:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+      description: 'Запись или Тип события не найден: «Запись не найдена».'
+    SlotStatus:
+      type: string
+      enum:
+        - free
+        - taken
+      description: |-
+        Доменная модель «Календаря звонков» — по контракту API-слоя в `src/api`.
+
+        Важно: это модель данных, а не HTTP-API. Сервис клиентский: модули `src/api` читают и пишут
+        localStorage напрямую, эндпоинтов нет (см. `docs/spec.md`: «Данные хранятся в браузере
+        (localStorage) через API-слой; сервер и авторизация не нужны»). Поэтому ниже описаны
+        сущности, их ограничения и операции слоя. Ссылки на функции — на `src/api`, чтобы можно было
+        сверять контракт с реализацией.
+
+        Термины — по GLOSSARY.md: Запись, Слот, Тип события.
+
+        Проверено компилятором TypeSpec 1.16.0: `tsp compile typespec/main.tsp`. Внешних библиотек
+        файл не требует, поэтому проверка проходит и без `@typespec/rest` в зависимостях проекта.Статус Слота для посетителя.
+    ValidationError:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ApiError'
+      description: 'Данные не прошли проверку: «Введите имя», «Выберите дату», «Введите телефон» и подобные.'
+servers:
+  - url: http://localhost:3000
+    description: Локальный сервер (не существует в v1)
+    variables: {}
