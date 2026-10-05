@@ -12,14 +12,6 @@
           "--browser",
           "chromium"
         ]
-      },
-      "render": {
-        "type": "remote",
-        "url": "https://mcp.render.com/mcp",
-        "oauth": false,
-        "headers": {
-          "Authorization": "Bearer {file:.secrets/render-api-key}"
-        }
       }
     }
   }
