@@ -58,6 +58,7 @@ const onAddType = async () => {
   if (!valid || !typeForm.durationMinutes) {
     return
   }
+  // TODO: test scheduled workflow
   try {
     createEventType({
       name: typeForm.name,
