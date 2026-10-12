@@ -83,6 +83,11 @@ namespace CalendarServer {
   @get
   op countFreeSlots(@query date: string): FreeSlotsCount | ApiError;
 
+  /** Число Слотов дня, занятых активными Записями. Соответствует `countTakenSlots`. */
+  @route("/slots/taken-count")
+  @get
+  op countTakenSlots(@query date: string): TakenSlotsCount | ApiError;
+
   /**
    * Последний день окна регистрации, `YYYY-MM-DD`: сегодня + 14 дней.
    * Соответствует `bookingWindowEnd`.
@@ -165,6 +170,11 @@ model EventTypeValidation {
 
 /** Количество свободных Слотов дня как тело ответа, а не голое число. */
 model FreeSlotsCount {
+  count: int32;
+}
+
+/** Количество занятых Слотов дня как тело ответа, а не голое число. */
+model TakenSlotsCount {
   count: int32;
 }
 

@@ -1,9 +1,19 @@
+import { ref } from 'vue'
+
 import { listEventTypes } from './eventTypes'
 import { generateId } from './id'
 import { bookingRange, fitsInDay, isStartTime, overlaps, startTimestamp } from './slots'
 import type { Booking, Contact } from './types'
 
 const STORAGE_KEY = 'calendar-bookings'
+
+/**
+ * Версия хранилища Записей: растёт при каждом изменении. Функции занятости в
+ * `src/api/availability` читают её, чтобы computed, который считает занятость из
+ * localStorage (бейджи календаря), пересчитывался после записи и отмены — сам
+ * localStorage реактивности не даёт.
+ */
+export const storageVersion = ref(0)
 
 export type BookingInput = {
   eventTypeId: string
@@ -27,6 +37,7 @@ const readStorage = (): Booking[] => {
 
 const writeStorage = (bookings: Booking[]): void => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings))
+  storageVersion.value += 1
 }
 
 export const listBookings = (): Booking[] => readStorage()

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 
-import { countFreeSlots, listDayStarts } from '@/api/availability'
+import { countFreeSlots, countTakenSlots, listDayStarts } from '@/api/availability'
 import type { DaySlot } from '@/api/availability'
 import { createBooking } from '@/api/bookings'
 import { listEventTypes } from '@/api/eventTypes'
@@ -25,12 +25,14 @@ vi.mock('@/api/bookings', () => ({
 vi.mock('@/api/availability', () => ({
   bookingWindowEnd: vi.fn(() => '2026-10-19'),
   countFreeSlots: vi.fn(),
+  countTakenSlots: vi.fn(),
   listDayStarts: vi.fn(),
 }))
 
 const mockedListTypes = vi.mocked(listEventTypes)
 const mockedListDayStarts = vi.mocked(listDayStarts)
 const mockedCountFreeSlots = vi.mocked(countFreeSlots)
+const mockedCountTakenSlots = vi.mocked(countTakenSlots)
 const mockedCreateBooking = vi.mocked(createBooking)
 
 const DATE = '2026-10-05'
@@ -74,6 +76,12 @@ const slotWith = (wrapper: Wrapper, time: string) => {
   return slot
 }
 
+const calendarDay = (wrapper: Wrapper, day: number) =>
+  wrapper
+    .findComponent(MonthCalendar)
+    .findAll('.day:not(.day--outside)')
+    .find((cell) => cell.find('.day-number').text() === String(day))
+
 const infoValues = (wrapper: Wrapper) => wrapper.findAll('.info-value').map((item) => item.text())
 
 const continueButton = (wrapper: Wrapper) => {
@@ -98,6 +106,7 @@ describe('BookingPage', () => {
     mockedListTypes.mockReturnValue([thirtyMinutes])
     mockedListDayStarts.mockImplementation(() => buildSlots())
     mockedCountFreeSlots.mockReturnValue(18)
+    mockedCountTakenSlots.mockReturnValue(0)
   })
 
   it('asks to choose a type when there are no types at all', async () => {
@@ -161,6 +170,21 @@ describe('BookingPage', () => {
     await taken.trigger('click')
 
     expect(wrapper.findAll('.slot--selected')).toHaveLength(0)
+  })
+
+  it('marks the days with occupied slots in the calendar like in the journal', async () => {
+    // Занятость должна быть видна до выбора дня: как в Предстоящих событиях.
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(`${DATE}T12:00:00`))
+    try {
+      mockedCountTakenSlots.mockImplementation((date: string) => (date === DATE ? 2 : 0))
+      const { wrapper } = await mountPage()
+
+      expect(calendarDay(wrapper, 5)?.classes()).toContain('day--has-items')
+      expect(calendarDay(wrapper, 6)?.classes()).not.toContain('day--has-items')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('enables «Продолжить» only after a slot is picked', async () => {

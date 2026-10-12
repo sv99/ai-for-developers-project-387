@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { computed } from 'vue'
+
 const importApi = async () => {
   const eventTypes = await import('../eventTypes')
   const bookings = await import('../bookings')
@@ -146,5 +148,75 @@ describe('availability API', () => {
     expect(() =>
       api.createBooking({ eventTypeId: type.id, date: TOMORROW, startTime: '10:00', contact }),
     ).not.toThrow()
+  })
+
+  it('counts the slots taken by active bookings', async () => {
+    const api = await importApi()
+    const type = createType(api, 60)
+
+    expect(api.countTakenSlots(TOMORROW)).toBe(0)
+
+    api.createBooking({ eventTypeId: type.id, date: TOMORROW, startTime: '10:00', contact })
+
+    expect(api.countTakenSlots(TOMORROW)).toBe(2)
+  })
+
+  it('recounts the taken slots when a booking is cancelled', async () => {
+    const api = await importApi()
+    const type = createType(api, 60)
+    const booking = api.createBooking({
+      eventTypeId: type.id,
+      date: TOMORROW,
+      startTime: '10:00',
+      contact,
+    })
+
+    api.cancelBooking(booking.id)
+
+    expect(api.countTakenSlots(TOMORROW)).toBe(0)
+  })
+
+  it('recomputes the free slots when a booking is created', async () => {
+    // Бейджи календаря читают localStorage внутри computed: он обязан пересчитываться
+    // после записи, хотя сам localStorage реактивности не даёт.
+    const api = await importApi()
+    const type = createType(api, 30)
+    const free = computed(() => api.countFreeSlots(TOMORROW))
+
+    expect(free.value).toBe(18)
+
+    api.createBooking({ eventTypeId: type.id, date: TOMORROW, startTime: '10:00', contact })
+
+    expect(free.value).toBe(17)
+  })
+
+  it('recomputes the free slots when a booking is cancelled', async () => {
+    const api = await importApi()
+    const type = createType(api, 30)
+    const booking = api.createBooking({
+      eventTypeId: type.id,
+      date: TOMORROW,
+      startTime: '10:00',
+      contact,
+    })
+    const free = computed(() => api.countFreeSlots(TOMORROW))
+
+    expect(free.value).toBe(17)
+
+    api.cancelBooking(booking.id)
+
+    expect(free.value).toBe(18)
+  })
+
+  it('recomputes the taken slots when a booking is created', async () => {
+    const api = await importApi()
+    const type = createType(api, 60)
+    const taken = computed(() => api.countTakenSlots(TOMORROW))
+
+    expect(taken.value).toBe(0)
+
+    api.createBooking({ eventTypeId: type.id, date: TOMORROW, startTime: '10:00', contact })
+
+    expect(taken.value).toBe(2)
   })
 })

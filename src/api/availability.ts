@@ -1,4 +1,4 @@
-import { listBookings } from './bookings'
+import { listBookings, storageVersion } from './bookings'
 import { listEventTypes } from './eventTypes'
 import {
   bookingRange,
@@ -48,6 +48,10 @@ const isPastStart = (date: string, startTime: string): boolean =>
   startTimestamp(date, startTime) <= Date.now()
 
 const takenMinutes = (date: string): Set<number> => {
+  // Чтение версии хранилища делает занятость реактивной: computed, который считает
+  // её из localStorage (бейджи календаря), пересчитывается после записи и отмены.
+  void storageVersion.value
+
   const durations = new Map(listEventTypes().map((type) => [type.id, type.durationMinutes]))
   const taken = new Set<number>()
 
@@ -86,6 +90,9 @@ export const listDaySlots = (date: string): DaySlot[] => {
 
 export const countFreeSlots = (date: string): number =>
   listDaySlots(date).filter((slot) => slot.status === 'free').length
+
+/** Сколько Слотов дня занято активными Записями — занятость дня для подсветки календаря. */
+export const countTakenSlots = (date: string): number => takenMinutes(date).size
 
 /** Слоты, которые могут стать началом события такой длительности. */
 export const listDayStarts = (date: string, durationMinutes: number): DaySlot[] =>

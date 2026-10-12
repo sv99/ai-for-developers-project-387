@@ -210,17 +210,27 @@ describe('MonthCalendar', () => {
     expect(dayInMonth(wrapper, 28)?.find('.day-count').text()).toBe('18 зап.')
   })
 
-  it('highlights the days that have items', () => {
+  it('highlights the days that have occupied slots', () => {
     const wrapper = mountCalendar({
-      highlightFull: true,
-      counts: (date: string) => (date === '2026-03-30' ? 2 : 0),
+      takenCounts: (date: string) => (date === '2026-03-30' ? 2 : 0),
     })
 
     expect(dayInMonth(wrapper, 30)?.classes()).toContain('day--has-items')
     expect(dayInMonth(wrapper, 29)?.classes()).not.toContain('day--has-items')
   })
 
-  it('does not highlight the days while the highlight is off', () => {
+  it('does not highlight a muted day even when it is occupied', () => {
+    // Полностью занятый день серый: занятость видна из приглушения, подсветка не нужна.
+    const wrapper = mountCalendar({
+      counts: (date: string) => (date === '2026-03-30' ? 0 : 18),
+      takenCounts: () => 18,
+    })
+
+    expect(dayInMonth(wrapper, 30)?.classes()).toContain('day--muted')
+    expect(dayInMonth(wrapper, 30)?.classes()).not.toContain('day--has-items')
+  })
+
+  it('does not highlight the days while the occupancy counts are missing', () => {
     const wrapper = mountCalendar()
 
     expect(wrapper.findAll('.day--has-items')).toHaveLength(0)

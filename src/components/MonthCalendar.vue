@@ -10,14 +10,15 @@ const props = withDefaults(
     counts: (date: string) => number
     /** Единица в подписи дня: «N св.» на странице Записи, «N зап.» в журнале. */
     countSuffix?: string
-    /** Подсвечивать фоном дни, у которых есть единицы: в журнале так видны дни с Записями. */
-    highlightFull?: boolean
+    /** Занятость дня для подсветки: занятые Слоты на странице Записи, Записи — в журнале.
+     *  Дни с занятостью подсвечиваются одинаково на обеих страницах. */
+    takenCounts?: (date: string) => number
     /** Сегодняшняя дата; нужна только тестам. */
     today?: string
     /** Последний день окна регистрации; пустая строка — без ограничения. */
     windowEnd?: string
   }>(),
-  { countSuffix: 'св.', highlightFull: false, today: '', windowEnd: '' },
+  { countSuffix: 'св.', today: '', windowEnd: '' },
 )
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -78,6 +79,8 @@ type DayCell = {
   /** День за окном регистрации — записаться на него нельзя. */
   beyond: boolean
   free: number
+  /** Занятость дня: занятые Слоты на странице Записи, Записи — в журнале. */
+  busy: number
   /** День можно выбрать: он не прошёл, попадает в окно и имеет свободные Слоты. */
   available: boolean
 }
@@ -94,6 +97,7 @@ const cells = computed<DayCell[]>(() => {
     const past = iso < today.value
     const beyond = props.windowEnd !== '' && iso > props.windowEnd
     const free = props.counts(iso)
+    const busy = props.takenCounts?.(iso) ?? 0
 
     return {
       iso,
@@ -102,6 +106,7 @@ const cells = computed<DayCell[]>(() => {
       past,
       beyond,
       free,
+      busy,
       available: !past && !beyond && free > 0,
     }
   })
@@ -167,7 +172,7 @@ const pick = (cell: DayCell) => {
         :class="{
           'day--outside': !cell.inMonth,
           'day--muted': !cell.available,
-          'day--has-items': highlightFull && cell.free > 0,
+          'day--has-items': cell.available && cell.busy > 0,
           'day--selected': cell.iso === modelValue,
           'day--today': cell.iso === today,
         }"
