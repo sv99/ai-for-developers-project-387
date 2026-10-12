@@ -27,7 +27,6 @@ declare module 'vue' {
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSpace: typeof import('element-plus/es')['ElSpace']
     ElTag: typeof import('element-plus/es')['ElTag']
-    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     EventTypeCard: typeof import('./src/components/EventTypeCard.vue')['default']
     MonthCalendar: typeof import('./src/components/MonthCalendar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
