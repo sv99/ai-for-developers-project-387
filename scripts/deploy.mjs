@@ -9,7 +9,14 @@
 //   RENDER_SERVICE_ID    optional — service id (srv-...); skips the lookup by name
 //   RENDER_SERVICE_NAME  optional — service name to look up (default: calendar-slot)
 //
+// Before triggering, the script checks that the service is connected to the repo of
+// this checkout (git remote origin). A mismatch aborts the deploy: a service pointed
+// at another repo silently ships stale code (that is how the calendar once lost its
+// new build after the project migration).
+//
 // The service itself is created from render.yaml (Render Dashboard → New → Blueprint).
+
+import { spawnSync } from 'node:child_process'
 
 const API = 'https://api.render.com/v1'
 const DEFAULT_SERVICE_NAME = 'calendar-slot'
@@ -76,8 +83,10 @@ async function api(path, init = {}) {
   return body
 }
 
-async function resolveServiceId() {
-  if (process.env.RENDER_SERVICE_ID) return process.env.RENDER_SERVICE_ID
+async function resolveService() {
+  if (process.env.RENDER_SERVICE_ID) {
+    return api(`/services/${process.env.RENDER_SERVICE_ID}`)
+  }
 
   const target = serviceArg ?? process.env.RENDER_SERVICE_NAME ?? DEFAULT_SERVICE_NAME
   const entries = await api('/services?limit=100')
@@ -91,17 +100,55 @@ async function resolveServiceId() {
     )
   }
 
-  return service.id
+  return service
+}
+
+/** Repo of this checkout, normalized to the form the Render API returns (https://github.com/owner/repo). */
+function currentRepo() {
+  const result = spawnSync('git', ['remote', 'get-url', 'origin'], { encoding: 'utf8' })
+  if (result.status !== 0) {
+    return undefined
+  }
+
+  const match = result.stdout.trim().match(/github\.com[/:](.+?)(\.git)?$/i)
+  return match ? `https://github.com/${match[1]}` : undefined
+}
+
+/** Abort when the service would deploy code from another repo (see render.yaml migration). */
+function assertServiceRepo(service) {
+  const expected = currentRepo()
+
+  if (!expected) {
+    console.warn('Could not read git remote origin, skipping the service repo check.')
+    return
+  }
+
+  const actual = service.repo?.replace(/\.git$/, '')
+
+  if (actual?.toLowerCase() !== expected.toLowerCase()) {
+    throw new Error(
+      `Service ${service.id} (${service.name}) is connected to ${actual ?? 'no repo'}, ` +
+        `but this checkout is ${expected}.\n` +
+        `Deploying would ship the wrong code. Repoint the service first, e.g.:\n` +
+        `  curl -X PATCH ${API}/services/${service.id} \\\n` +
+        `    -H "Authorization: Bearer $RENDER_API_KEY" \\\n` +
+        `    -H "Content-Type: application/json" \\\n` +
+        `    -d '{"repo": "${expected}", "branch": "${service.branch}"}'`,
+    )
+  }
+
+  console.log(`Repo check ok: ${actual}`)
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 async function main() {
-  const serviceId = await resolveServiceId()
+  const service = await resolveService()
+  assertServiceRepo(service)
 
-  console.log(`Triggering deploy for ${serviceId}${clearCache ? ' (clear cache)' : ''}…`)
+  console.log(`Triggering deploy for ${service.id}${clearCache ? ' (clear cache)' : ''}…`)
 
-  const deploy = await api(`/services/${serviceId}/deploys`, {
+  const deploy = await api(`/services/${service.id}/deploys`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ clearCache: clearCache ? 'clear' : 'do_not_clear' }),
@@ -113,7 +160,7 @@ async function main() {
 
   while (!TERMINAL_SUCCESS.has(current.status) && !TERMINAL_FAILURE.has(current.status)) {
     await sleep(POLL_INTERVAL_MS)
-    current = await api(`/services/${serviceId}/deploys/${deploy.id}`)
+    current = await api(`/services/${service.id}/deploys/${deploy.id}`)
     console.log(`  status: ${current.status}`)
   }
 
