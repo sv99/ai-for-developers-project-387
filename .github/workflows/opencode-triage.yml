@@ -7,6 +7,10 @@ on:
 
 jobs:
   opencode:
+    # Отсекаем issues от ботов (включая самого opencode-агента): scheduled-воркфлоу
+    # сам создаёт issues — триаж не должен реагировать на собственную работу.
+    # Для workflow_dispatch github.event.issue отсутствует, условие истинно.
+    if: github.event.issue.user.type != 'Bot'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
