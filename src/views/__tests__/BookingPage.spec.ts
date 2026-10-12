@@ -109,7 +109,7 @@ describe('BookingPage', () => {
     mockedCountTakenSlots.mockReturnValue(0)
   })
 
-  // Тосты ElMessage висят в body до автозакрытия (3 с) — убираем между тестами.
+  // Тосты ElMessage висят в body до автозакрытия (5 с) — убираем между тестами.
   afterEach(() => {
     document.querySelectorAll('.el-message').forEach((message) => message.remove())
   })

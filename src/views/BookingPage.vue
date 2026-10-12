@@ -137,9 +137,12 @@ const onSubmit = async () => {
     step.value = 'done'
   } catch (error) {
     // Конфликт слота не должен теряться в тексте формы — кричим об этом тостом.
-    ElMessage.error(
-      error instanceof Error ? error.message : 'Не удалось записаться. Попробуйте ещё раз.',
-    )
+    // 5 с вместо дефолтных 3 с, чтобы сообщение успели прочитать.
+    ElMessage.error({
+      message:
+        error instanceof Error ? error.message : 'Не удалось записаться. Попробуйте ещё раз.',
+      duration: 5000,
+    })
     // Слот мог уйти, пока заполняли контакт: возвращаемся к обновлённому списку времени.
     selectedStart.value = ''
     refreshSlots()
