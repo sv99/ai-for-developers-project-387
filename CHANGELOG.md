@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0 (2026-10-12)
+
+
+### Features
+
+* единый показ занятости в календаре страницы Записи ([134ec88](https://github.com/sv99/ai-for-developers-project-387/commit/134ec88a1aeda80dd30befc2f6a4307e4c728d90)), closes [#10](https://github.com/sv99/ai-for-developers-project-387/issues/10)
+
+
+### Bug Fixes
+
+* добавить roadmap развития в README ([3276fd0](https://github.com/sv99/ai-for-developers-project-387/commit/3276fd0b3bb53defc0f877ef2861ed5351bfb8e4))
+
 ## [1.7.0](https://github.com/sv99/ai-for-developers-project-386/compare/v1.6.0...v1.7.0) (2026-10-01)
 
 
