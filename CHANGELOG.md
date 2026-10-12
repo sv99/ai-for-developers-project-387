@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/sv99/ai-for-developers-project-387/compare/v1.7.0...v1.7.1) (2026-10-12)
+
+
+### Bug Fixes
+
+* проверять repo Render-сервиса перед деплоем ([44cba33](https://github.com/sv99/ai-for-developers-project-387/commit/44cba3365835e3aecf6b73b65cf37b84edc8ea82))
+
 ## [1.7.0](https://github.com/sv99/ai-for-developers-project-386/compare/v1.6.0...v1.7.0) (2026-10-01)
 
 
