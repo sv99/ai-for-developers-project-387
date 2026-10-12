@@ -3,7 +3,7 @@ name: Issue Triage
 on:
   workflow_dispatch:
   issues:
-    types: [created, labeled]
+    types: [opened]
 
 jobs:
   opencode:
