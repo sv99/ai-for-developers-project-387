@@ -3,7 +3,9 @@
 
   // Override to include only test files and clear exclusions.
   // Application code imported in tests is automatically included via module resolution.
-  "include": ["src/**/__tests__/*", "env.d.ts"],
+  // auto-imports.d.ts объявляет глобальные API Element Plus (ElMessage и т.п.),
+  // которые видимы и в коде приложения, подтянутом тестами через импорты.
+  "include": ["src/**/__tests__/*", "env.d.ts", "auto-imports.d.ts"],
   "exclude": [],
 
   "compilerOptions": {

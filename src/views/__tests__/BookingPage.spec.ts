@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { flushPromises, mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -107,6 +107,11 @@ describe('BookingPage', () => {
     mockedListDayStarts.mockImplementation(() => buildSlots())
     mockedCountFreeSlots.mockReturnValue(18)
     mockedCountTakenSlots.mockReturnValue(0)
+  })
+
+  // Тосты ElMessage висят в body до автозакрытия (3 с) — убираем между тестами.
+  afterEach(() => {
+    document.querySelectorAll('.el-message').forEach((message) => message.remove())
   })
 
   it('asks to choose a type when there are no types at all', async () => {
@@ -347,9 +352,10 @@ describe('BookingPage', () => {
     await fillContact(wrapper)
     await submitContact(wrapper)
 
-    expect(wrapper.text()).toContain('Это время уже занято')
     expect(wrapper.text()).toContain('Статус слотов')
     expect(wrapper.findAll('.slot--selected')).toHaveLength(0)
     expect(slotWith(wrapper, '10:00').text()).toContain('Занято')
+    // Тост ElMessage рисуется в document.body, вне дерева компонента.
+    expect(document.body.textContent).toContain('Это время уже занято')
   })
 })
