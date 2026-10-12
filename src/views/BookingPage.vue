@@ -33,7 +33,6 @@ const selectedDate = ref('')
 const selectedStart = ref('')
 const daySlots = ref<DaySlot[]>([])
 const freeSlots = ref(0)
-const submitError = ref('')
 const confirmation = ref<Booking | null>(null)
 // Дальше конца окна регистрации записываться некуда — календарь не листается.
 const windowEnd = bookingWindowEnd()
@@ -81,7 +80,6 @@ const pickSlot = (slot: DaySlot) => {
     return
   }
   selectedStart.value = slot.startTime
-  submitError.value = ''
 }
 
 const formRef = ref<FormInstance>()
@@ -123,7 +121,6 @@ const backToTypes = () => {
 }
 
 const onSubmit = async () => {
-  submitError.value = ''
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid || !eventType.value) {
     return
@@ -139,8 +136,13 @@ const onSubmit = async () => {
     refreshSlots()
     step.value = 'done'
   } catch (error) {
-    submitError.value =
-      error instanceof Error ? error.message : 'Не удалось записаться. Попробуйте ещё раз.'
+    // Конфликт слота не должен теряться в тексте формы — кричим об этом тостом.
+    // 5 с вместо дефолтных 3 с, чтобы сообщение успели прочитать.
+    ElMessage.error({
+      message:
+        error instanceof Error ? error.message : 'Не удалось записаться. Попробуйте ещё раз.',
+      duration: 5000,
+    })
     // Слот мог уйти, пока заполняли контакт: возвращаемся к обновлённому списку времени.
     selectedStart.value = ''
     refreshSlots()
@@ -152,7 +154,6 @@ const bookAgain = () => {
   selectedDate.value = ''
   selectedStart.value = ''
   confirmation.value = null
-  submitError.value = ''
   form.name = ''
   form.phone = ''
   refreshSlots()
@@ -225,8 +226,6 @@ const bookAgain = () => {
               </li>
             </ul>
 
-            <p v-if="submitError" class="form-error" role="alert">{{ submitError }}</p>
-
             <div class="actions">
               <el-button size="large" class="action" @click="backToTypes">Назад</el-button>
               <el-button
@@ -261,7 +260,6 @@ const bookAgain = () => {
             <el-form-item prop="phone">
               <el-input v-model="form.phone" size="large" placeholder="Телефон" />
             </el-form-item>
-            <p v-if="submitError" class="form-error" role="alert">{{ submitError }}</p>
             <el-button native-type="submit" size="large" type="primary" class="submit-button">
               Подтвердить запись
             </el-button>
@@ -438,12 +436,6 @@ const bookAgain = () => {
   border-radius: 8px;
   background-color: var(--el-fill-color-light);
   color: var(--el-text-color-secondary);
-}
-
-.form-error {
-  margin: 0 0 12px;
-  font-size: 14px;
-  color: var(--el-color-danger);
 }
 
 .actions {
