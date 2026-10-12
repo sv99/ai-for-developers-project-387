@@ -1,8 +1,9 @@
 name: Issue Triage
 
 on:
+  workflow_dispatch:
   issues:
-    types: [created]
+    types: [created, labeled]
 
 jobs:
   opencode:
