@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/sv99/ai-for-developers-project-387/compare/v1.7.1...v1.8.0) (2026-10-12)
+
+
+### Features
+
+* тост об ошибке занятости слота на странице Записи ([40f3e8b](https://github.com/sv99/ai-for-developers-project-387/commit/40f3e8bd51b3737cb94c43cfa32e3289453f1ac9)), closes [#5](https://github.com/sv99/ai-for-developers-project-387/issues/5)
+
 ## [1.7.1](https://github.com/sv99/ai-for-developers-project-387/compare/v1.7.0...v1.7.1) (2026-10-12)
 
 
