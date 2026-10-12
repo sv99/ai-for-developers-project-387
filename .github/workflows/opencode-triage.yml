@@ -20,7 +20,7 @@ jobs:
 
       - name: Run opencode
         uses: anomalyco/opencode/github@latest
-        if: steps.check.outputs.result == 'true'
+        # if: steps.check.outputs.result == 'true'
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
