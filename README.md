@@ -120,6 +120,31 @@ render.yaml
 
 Если проблема маленькая, можно попробовать сразу ее решить `/oc fix` - в результате получим PR.
 
+## Workflows
+
+Все воркфлоу лежат в `.github/workflows/`.
+
+| Файл | Что делает | Когда запускается |
+| --- | --- | --- |
+| `ci.yml` | Тесты, сборка и smoke-тест (`<div id="app">` в HTML) | push в любую ветку, PR |
+| `hexlet-check.yml` | Проверки Хекслета. Сгенерирован автоматически — не редактировать | push |
+| `release-please.yml` | Ведёт релизный PR по Conventional Commits (`feat:`/`fix:`), поднимает версию в `package.json` и `.release-please-manifest.json` | push в main |
+| `release.yml` | По тегу `v*.*.*` собирает и прикрепляет `dist-<тег>.zip` к релизу | пуш тега |
+| `opencode.yml` | Агент реагирует на команды `/oc`, `/opencode` в комментариях к issues и PR | комментарий к issue, комментарий к diff (только после Submit ревью) |
+| `opencode-triage.yml` | Агент разбирает новый issue и оставляет комментарий с разбором | создание issue |
+| `opencode-review.yml` | Агент ревьюит PR: баги, риски, читабельность | PR открыт, новый пуш, reopen, готов к ревью |
+| `opencode-scheduled.yml` | Агент ищет TODO-комментарии в коде и заводит issues по находкам | каждый понедельник 9:00 UTC, вручную |
+
+Защита от петель: opencode-воркфлоу не реагируют на события от ботов (`user.type == 'Bot'`), поэтому агент не запускает сам себя — на свои комментарии, issues и PR (`opencode-review.yml` скипает бот-PR).
+
+Секреты: `RELEASE_PLEASE_TOKEN` — релизы; `OPENCODE_API_KEY` и `RENDER_API_KEY` — воркфлоу с агентом.
+
+Ручной запуск scheduled-воркфлоу для теста:
+
+```bash
+gh workflow run "Scheduled OpenCode Task" --ref main
+```
+
 ## Что дальше
 
 После успешной проверки проект можно развивать как продукт и добавлять новые возможности.
