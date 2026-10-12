@@ -75,8 +75,8 @@ const cancel = () => {
           <MonthCalendar
             :model-value="selectedDate"
             :counts="countBookings"
+            :taken-counts="countBookings"
             count-suffix="зап."
-            highlight-full
             @update:model-value="pickDate"
           />
         </section>

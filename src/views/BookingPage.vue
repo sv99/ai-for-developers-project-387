@@ -3,7 +3,12 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 
-import { bookingWindowEnd, countFreeSlots, listDayStarts } from '@/api/availability'
+import {
+  bookingWindowEnd,
+  countFreeSlots,
+  countTakenSlots,
+  listDayStarts,
+} from '@/api/availability'
 import type { DaySlot } from '@/api/availability'
 import { createBooking } from '@/api/bookings'
 import { listEventTypes } from '@/api/eventTypes'
@@ -190,6 +195,7 @@ const bookAgain = () => {
             <MonthCalendar
               v-model="selectedDate"
               :counts="countFreeSlots"
+              :taken-counts="countTakenSlots"
               :window-end="windowEnd"
             />
           </section>

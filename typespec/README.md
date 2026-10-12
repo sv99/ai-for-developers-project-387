@@ -9,7 +9,7 @@
 - перечисления `SlotStatus` (свободно / занято) и `BookingStatus` (активна / отменена);
 - модели `TimeRange`, `DaySlot`, `EventType`, `EventTypeInput`, `Contact`, `Booking`, `BookingInput`, `CalendarName`;
 - ошибки `ApiError`, `NotFoundError`, `ValidationError`, `ConflictError` — с текстами из кода;
-- операции API-слоя: `listBookings`, `listUpcomingBookings`, `createBooking`, `cancelBooking`, `listDaySlots`, `countFreeSlots`, `bookingWindowEnd`, `listEventTypes`, `createEventType`, `getCalendarName`, `setCalendarName`.
+- операции API-слоя: `listBookings`, `listUpcomingBookings`, `createBooking`, `cancelBooking`, `listDaySlots`, `countFreeSlots`, `countTakenSlots`, `bookingWindowEnd`, `listEventTypes`, `createEventType`, `getCalendarName`, `setCalendarName`.
 
 В описаниях зафиксированы доменные правила: 30-минутная сетка 09:00–18:00, окно регистрации 14 дней, значение «занято» (занято активной Записью, время прошло или день вне окна), сохранение тела Записи при отмене. Термины — по `GLOSSARY.md`.
 
@@ -37,7 +37,7 @@ pnpm tsp:check
 
 `typespec/http.tsp` — **справочный прототип**, задел на будущий сервер. Он импортирует `main.tsp`, переиспользует модели и навешивает на те же операции HTTP-поверхность: `@service`, `@server`, `@route`, `@get`/`@post`/`@put`, `@path`/`@query`/`@body`, `@statusCode` и коды ошибок (`ValidationError` → 400, `NotFoundError` → 404, `ConflictError` → 409).
 
-С добавленной HTTP-поверхностью эмиттеры дают то, что нужно: полноценный OpenAPI со всеми 11 путями и схемами, а SDK-эмиттер — клиент с настоящими маршрутами (`GET /bookings`, `POST /bookings/{id}/cancel` …) вместо фиктивного `GET /`.
+С добавленной HTTP-поверхностью эмиттеры дают то, что нужно: полноценный OpenAPI со всеми 12 путями и схемами, а SDK-эмиттер — клиент с настоящими маршрутами (`GET /bookings`, `POST /bookings/{id}/cancel` …) вместо фиктивного `GET /`.
 
 `@typespec/http` и `@typespec/openapi3` стоят в `devDependencies`, поэтому `http.tsp` компилируется штатно. SDK-эмиттер (`@typespec/http-client-js`) в зависимости не добавлен — он нужен только для разовой демонстрации.
 

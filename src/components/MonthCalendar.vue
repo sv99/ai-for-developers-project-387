@@ -10,14 +10,15 @@ const props = withDefaults(
     counts: (date: string) => number
     /** Единица в подписи дня: «N св.» на странице Записи, «N зап.» в журнале. */
     countSuffix?: string
-    /** Подсвечивать фоном дни, у которых есть единицы: в журнале так видны дни с Записями. */
-    highlightFull?: boolean
+    /** Занятость дня для подсветки: занятые Слоты на странице Записи, Записи — в журнале.
+     *  Дни подсвечиваются цветом с насыщенностью по доле занятости, одинаково на обеих страницах. */
+    takenCounts?: (date: string) => number
     /** Сегодняшняя дата; нужна только тестам. */
     today?: string
     /** Последний день окна регистрации; пустая строка — без ограничения. */
     windowEnd?: string
   }>(),
-  { countSuffix: 'св.', highlightFull: false, today: '', windowEnd: '' },
+  { countSuffix: 'св.', today: '', windowEnd: '' },
 )
 
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>()
@@ -78,8 +79,27 @@ type DayCell = {
   /** День за окном регистрации — записаться на него нельзя. */
   beyond: boolean
   free: number
+  /** Занятость дня: занятые Слоты на странице Записи, Записи — в журнале. */
+  busy: number
   /** День можно выбрать: он не прошёл, попадает в окно и имеет свободные Слоты. */
   available: boolean
+  /** Насыщенность подсветки по доле занятости; пустая строка — день не подсвечивается. */
+  level: 'light' | 'medium' | 'heavy' | ''
+}
+
+/** Насыщенность подсветки растёт вместе с долей занятых Слотов среди доступных дню. */
+const busyLevel = (available: boolean, free: number, busy: number): DayCell['level'] => {
+  if (!available || busy <= 0) {
+    return ''
+  }
+  const share = busy / (busy + free)
+  if (share >= 2 / 3) {
+    return 'heavy'
+  }
+  if (share >= 1 / 3) {
+    return 'medium'
+  }
+  return 'light'
 }
 
 const cells = computed<DayCell[]>(() => {
@@ -94,6 +114,8 @@ const cells = computed<DayCell[]>(() => {
     const past = iso < today.value
     const beyond = props.windowEnd !== '' && iso > props.windowEnd
     const free = props.counts(iso)
+    const busy = props.takenCounts?.(iso) ?? 0
+    const available = !past && !beyond && free > 0
 
     return {
       iso,
@@ -102,7 +124,9 @@ const cells = computed<DayCell[]>(() => {
       past,
       beyond,
       free,
-      available: !past && !beyond && free > 0,
+      busy,
+      available,
+      level: busyLevel(available, free, busy),
     }
   })
 })
@@ -167,7 +191,10 @@ const pick = (cell: DayCell) => {
         :class="{
           'day--outside': !cell.inMonth,
           'day--muted': !cell.available,
-          'day--has-items': highlightFull && cell.free > 0,
+          'day--has-items': cell.available && cell.busy > 0,
+          'day--busy-light': cell.level === 'light',
+          'day--busy-medium': cell.level === 'medium',
+          'day--busy-heavy': cell.level === 'heavy',
           'day--selected': cell.iso === modelValue,
           'day--today': cell.iso === today,
         }"
@@ -263,12 +290,21 @@ const pick = (cell: DayCell) => {
   cursor: pointer;
 }
 
-.day--has-items {
-  background-color: var(--el-color-primary-light-9);
-}
-
 .day--has-items .day-count {
   color: var(--el-color-primary-dark-2);
+}
+
+/* Насыщенность фона — по доле занятых Слотов дня: чем больше занято, тем ярче цвет. */
+.day--busy-light {
+  background-color: var(--el-color-primary-light-8);
+}
+
+.day--busy-medium {
+  background-color: var(--el-color-primary-light-5);
+}
+
+.day--busy-heavy {
+  background-color: var(--el-color-primary-light-3);
 }
 
 .day:hover:not(:disabled) {

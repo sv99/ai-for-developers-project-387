@@ -240,6 +240,26 @@ paths:
                 anyOf:
                   - $ref: '#/components/schemas/FreeSlotsCount'
                   - $ref: '#/components/schemas/ApiError'
+  /slots/taken-count:
+    get:
+      operationId: countTakenSlots
+      description: Число Слотов дня, занятых активными Записями. Соответствует `countTakenSlots`.
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/TakenSlotsCount'
+                  - $ref: '#/components/schemas/ApiError'
 components:
   schemas:
     ApiError:
@@ -449,6 +469,15 @@ components:
 
         Проверено компилятором TypeSpec 1.16.0: `tsp compile typespec/main.tsp`. Внешних библиотек
         файл не требует, поэтому проверка проходит и без `@typespec/rest` в зависимостях проекта.Статус Слота для посетителя.
+    TakenSlotsCount:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          format: int32
+      description: Количество занятых Слотов дня как тело ответа, а не голое число.
     ValidationError:
       type: object
       allOf:

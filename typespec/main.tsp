@@ -206,6 +206,12 @@ namespace CalendarApi {
   op countFreeSlots(date: string): int32 | ApiError;
 
   /**
+   * Число Слотов дня, занятых активными Записями, — занятость дня для подсветки календаря.
+   * Соответствует `countTakenSlots`.
+   */
+  op countTakenSlots(date: string): int32 | ApiError;
+
+  /**
    * Последний день окна регистрации, `YYYY-MM-DD`: сегодня + 14 дней.
    * Соответствует `bookingWindowEnd`.
    */

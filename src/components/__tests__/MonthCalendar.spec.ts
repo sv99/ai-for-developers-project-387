@@ -210,19 +210,56 @@ describe('MonthCalendar', () => {
     expect(dayInMonth(wrapper, 28)?.find('.day-count').text()).toBe('18 зап.')
   })
 
-  it('highlights the days that have items', () => {
+  it('highlights the days that have occupied slots', () => {
     const wrapper = mountCalendar({
-      highlightFull: true,
-      counts: (date: string) => (date === '2026-03-30' ? 2 : 0),
+      takenCounts: (date: string) => (date === '2026-03-30' ? 2 : 0),
     })
 
     expect(dayInMonth(wrapper, 30)?.classes()).toContain('day--has-items')
     expect(dayInMonth(wrapper, 29)?.classes()).not.toContain('day--has-items')
   })
 
-  it('does not highlight the days while the highlight is off', () => {
+  it('colors the day by the share of its occupied slots', () => {
+    // 28 марта: 2 занятых из 18 (11%) — слабая подсветка, 30-е: 6 из 18 (33%) — средняя,
+    // 31-е: 12 из 18 (67%) — сильная.
+    const freeByDate: Record<string, number> = {
+      '2026-03-28': 16,
+      '2026-03-30': 12,
+      '2026-03-31': 6,
+    }
+    const busyByDate: Record<string, number> = {
+      '2026-03-28': 2,
+      '2026-03-30': 6,
+      '2026-03-31': 12,
+    }
+    const wrapper = mountCalendar({
+      counts: (date: string) => freeByDate[date] ?? 18,
+      takenCounts: (date: string) => busyByDate[date] ?? 0,
+    })
+
+    expect(dayInMonth(wrapper, 28)?.classes()).toContain('day--busy-light')
+    expect(dayInMonth(wrapper, 30)?.classes()).toContain('day--busy-medium')
+    expect(dayInMonth(wrapper, 31)?.classes()).toContain('day--busy-heavy')
+  })
+
+  it('does not highlight a muted day even when it is occupied', () => {
+    // Полностью занятый день серый: занятость видна из приглушения, подсветка не нужна.
+    const wrapper = mountCalendar({
+      counts: (date: string) => (date === '2026-03-30' ? 0 : 18),
+      takenCounts: () => 18,
+    })
+
+    expect(dayInMonth(wrapper, 30)?.classes()).toContain('day--muted')
+    expect(dayInMonth(wrapper, 30)?.classes()).not.toContain('day--has-items')
+    expect(
+      dayInMonth(wrapper, 30)?.classes().some((name) => name.startsWith('day--busy-')),
+    ).toBe(false)
+  })
+
+  it('does not highlight the days while the occupancy counts are missing', () => {
     const wrapper = mountCalendar()
 
     expect(wrapper.findAll('.day--has-items')).toHaveLength(0)
+    expect(wrapper.findAll('.day--busy-light, .day--busy-medium, .day--busy-heavy')).toHaveLength(0)
   })
 })
