@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.3](https://github.com/sv99/ai-for-developers-project-387/compare/v1.8.2...v1.8.3) (2026-10-23)
+
+
+### Bug Fixes
+
+* убрать тестовый TODO из AdminPage ([#29](https://github.com/sv99/ai-for-developers-project-387/issues/29)) ([775b1e6](https://github.com/sv99/ai-for-developers-project-387/commit/775b1e62fec2b01f3026730bb0d7af02140ae426))
+
 ## [1.8.2](https://github.com/sv99/ai-for-developers-project-387/compare/v1.8.1...v1.8.2) (2026-10-23)
 
 
