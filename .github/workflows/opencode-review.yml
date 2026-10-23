@@ -15,7 +15,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      pull-requests: read
+      # GITHUB_TOKEN (use_github_token) пишет комментарии ревью в PR.
+      pull-requests: write
       issues: read
     steps:
       - name: Checkout repository
@@ -28,8 +29,11 @@ jobs:
         # if: steps.check.outputs.result == 'true'
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: opencode/glm-5.3-flash
+          # Токен воркфлоу вместо токена GitHub App, полученного через OIDC.
+          use_github_token: true
           prompt: |
             Review this pull request:
             - Find bugs and risky changes
