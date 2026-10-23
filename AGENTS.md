@@ -53,6 +53,7 @@ Render деплоит сам: после пуша в main, когда прове
 
 ## opencode в GitHub Actions
 
+- Запуск только от участников: `opencode.yml`, `opencode-triage.yml`, `opencode-review.yml` проверяют `author_association` ∈ `OWNER`/`MEMBER`/`COLLABORATOR` в `if:` job. Не ослабляй это условие: репозиторий публичный.
 - Публичных сессий нет: `share` в экшене opencode устарел и игнорируется (sharing discontinued). Не добавляй `share` в воркфлоу. Ссылка в ответе агента — на запуск в Actions; логи публичные, как и репозиторий.
 
 ## Коммиты и PR

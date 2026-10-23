@@ -10,8 +10,11 @@ jobs:
   opencode:
     # Отсекаем события ботов (включая самого opencode-агента): его комментарии
     # могут содержать "/oc" как текст, а реакция агента на самого себя — петля.
+    # Команды посторонних (не OWNER/MEMBER/COLLABORATOR) игнорируем: не тратим ключ,
+    # а экшен не падает на проверке прав с комментарием об ошибке.
     if: |
       github.event.comment.user.type != 'Bot' &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association) &&
       (contains(github.event.comment.body, ' /oc') ||
       startsWith(github.event.comment.body, '/oc') ||
       contains(github.event.comment.body, ' /opencode') ||

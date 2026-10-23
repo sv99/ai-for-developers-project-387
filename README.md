@@ -137,6 +137,8 @@ render.yaml
 
 Защита от петель: opencode-воркфлоу не реагируют на события от ботов (`user.type == 'Bot'`), поэтому агент не запускает сам себя — на свои комментарии, issues и PR (`opencode-review.yml` скипает бот-PR).
 
+Доступ: агент запускается только на команды, issues и PR от участников репозитория (`author_association` — `OWNER`, `MEMBER` или `COLLABORATOR`). Посторонние в публичном репо не тратят `OPENCODE_API_KEY`, их события дают `skipped`.
+
 Публичные сессии агента (share): **не используются**.
 
 - Публикацию сессий в opencode прекратили: параметр экшена `share` — «Deprecated and ignored: session sharing was discontinued». В воркфлоу его нет и добавлять не нужно.
