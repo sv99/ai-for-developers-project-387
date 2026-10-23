@@ -9,8 +9,13 @@ jobs:
   opencode:
     # Отсекаем issues от ботов (включая самого opencode-агента): scheduled-воркфлоу
     # сам создаёт issues — триаж не должен реагировать на собственную работу.
-    # Для workflow_dispatch github.event.issue отсутствует, условие истинно.
-    if: github.event.issue.user.type != 'Bot'
+    # Issues посторонних (не OWNER/MEMBER/COLLABORATOR) не разбираем: не тратим ключ,
+    # а экшен не падает на проверке прав с комментарием об ошибке.
+    # workflow_dispatch (без github.event.issue) запускают только участники с правом записи.
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.issue.user.type != 'Bot' &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association))
     runs-on: ubuntu-latest
     permissions:
       id-token: write

@@ -10,7 +10,12 @@ jobs:
     # PR от bot-аккаунтов пропускаем, как и пуши бота в PR человека (например, `/oc`
     # смержил main в ветку): экшен проверяет права того, кто запустил событие,
     # а у opencode-agent[bot] нет write-доступа — ревью падает.
-    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') && !endsWith(github.actor, '[bot]') }}
+    # PR посторонних (не OWNER/MEMBER/COLLABORATOR) не ревьюим: не тратим ключ,
+    # а экшен не падает на проверке прав с комментарием об ошибке.
+    if: |
+      !endsWith(github.event.pull_request.user.login, '[bot]') &&
+      !endsWith(github.actor, '[bot]') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.pull_request.author_association)
     runs-on: ubuntu-latest
     permissions:
       # OIDC-токен экшен обменивает на токен GitHub App: ревью пишет opencode-agent[bot].
