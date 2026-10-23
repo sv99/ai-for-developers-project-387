@@ -46,6 +46,11 @@
 - `ci.yml` (push в main + PR): `pnpm test` → `pnpm build` → smoke-тест: `pnpm preview` на порту 4173, проверяется `id="app"` в HTML. **Не убирай `<div id="app">` из `index.html`** — упадёт smoke-тест.
 - `hexlet-check.yml` — сгенерирован Хекслетом: **не удалять, не переименовывать, не редактировать** (и не переименовывать репозиторий).
 
+## Коммиты и PR
+
+- Сообщения коммитов и заголовки PR — строго **Conventional Commits**: `<type>: <описание>`, тип из `feat`, `fix`, `docs`, `ci`, `chore`, `refactor`, `test`, `style`, `perf`, `build`; описание на русском. Без префикса release-please не увидит изменение.
+- Агент в GitHub (opencode): когда просят кратко резюмировать сделанные изменения (summary), ответ — тоже в этом формате, например `fix: тост ElMessage.error при занятом слоте`. Этот summary экшен использует как сообщение коммита и заголовок PR.
+
 ## Релизы (release-please)
 
 - Пуш в main запускает `release-please.yml` — по **Conventional Commits** (`feat:`, `fix:` …) создаёт release-PR и тег `v*.*.*`.
