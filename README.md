@@ -145,7 +145,7 @@ render.yaml
 - Ответ агента заканчивается ссылкой `[github run]` на запуск в Actions. Репозиторий публичный — лог с ходом работы агента виден всем, поэтому секреты агенту в комментариях не передавать.
 - Старые ссылки `opencode.ai/s/…` в комментариях до 12.10.2026 больше не открываются.
 
-Токены агента: все opencode-воркфлоу работают с токеном GitHub App через OIDC (`id-token: write`), поэтому ответы агента — от `opencode-agent[bot]`. Исключение — шаг публикации отчёта в `opencode-scheduled.yml`: он пишет issue через `GITHUB_TOKEN` от `github-actions[bot]`. Версия экшена: `opencode-review.yml` и `opencode-scheduled.yml` закреплены на SHA тега `v1.19.4`, `opencode.yml` и `opencode-triage.yml` — `@latest`.
+Токены агента: все opencode-воркфлоу работают с токеном GitHub App через OIDC (`id-token: write`), поэтому ответы агента — от `opencode-agent[bot]`. Исключение — шаг публикации отчёта в `opencode-scheduled.yml`: он пишет issue через `GITHUB_TOKEN` от `github-actions[bot]`. Версия экшена: все четыре opencode-воркфлоу закреплены на одном SHA коммита (тег `v1.19.4` репозитория `anomalyco/opencode`), а не на `@latest`, — новый релиз не меняет поведение агента сам. Обновление — заменить SHA во всех четырёх файлах одним PR.
 
 Секреты: `HEXLET_ID` — проверки Хекслета; `RELEASE_PLEASE_TOKEN` — релизы; `OPENCODE_API_KEY` — воркфлоу с агентом; `RENDER_API_KEY` в CI не нужен: Render деплоит сам после пуша в main, когда проверки прошли (`autoDeployTrigger: checksPass`).
 
