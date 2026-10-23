@@ -7,6 +7,8 @@
 Учебный проект Хекслета: <https://ru.hexlet.io/programs/ai-for-developers>
 Как это должно работать: <https://files.hexlet.app/a/2ipc5m>
 
+После того, как сделал DockerFile начали штатно отрабатываться проверки от hexlet_check.
+
 ## Стек
 
 - TypeScript
@@ -140,8 +142,6 @@ gh workflow run "Scheduled OpenCode Task" --ref main
 Деплой **автоматический, на стороне Render**: после пуша в `main` Render ждёт, пока пройдут все проверки GitHub (CI, hexlet-check), и сам собирает и выкладывает новую версию (`autoDeployTrigger: checksPass` в `render.yaml` и в настройках сервиса). Воркфлоу деплоя в GitHub Actions нет, секрет `RENDER_API_KEY` в CI не нужен. Если проверки на коммите упали, деплоя не будет.
 
 Статус и время деплоя — в Render Dashboard, вкладка **Events** сервиса `calendar-slot2`.
-
-После того, как сделал DockerFile начали штатно отрабатываться проверки от hexlet_check.
 
 Используемые конфигурационные файлы:
 
