@@ -24,7 +24,7 @@
 Два MCP-сервера в двух конфигах (в корне, оба **коммитятся**):
 
 - `opencode.json` — `playwright`, локальный, только для этого проекта; грузится всегда;
-- `opencode.render.json` — `render`, remote (`https://mcp.render.com/mcp`), ключ подставляется из переменной окружения `RENDER_API_KEY` через `{env:…}`. Подключается только переменной `OPENCODE_CONFIG` (абсолютный путь), opencode сливает его с `opencode.json`. На новой машине задай в `.envrc` (direnv; файл **не коммитится**) `RENDER_API_KEY=rnd_…` и `OPENCODE_CONFIG=$PWD/opencode.render.json`, иначе Render MCP не загрузится или вернёт `unauthorized`. Тот же ключ читает `scripts/deploy.mjs` из `RENDER_API_KEY`. В CI ключ и `OPENCODE_CONFIG` получает только `opencode.yml` (деплой по `/oc`); `opencode-review.yml`, `opencode-triage.yml` и `opencode-scheduled.yml` работают без Render.
+- `opencode.render.json` — `render`, remote (`https://mcp.render.com/mcp`), ключ подставляется из переменной окружения `RENDER_API_KEY` через `{env:…}`. Подключается только переменной `OPENCODE_CONFIG` (абсолютный путь), opencode сливает его с `opencode.json`. В CI ключ и `OPENCODE_CONFIG` получает только `opencode.yml` (деплой по `/oc`); `opencode-review.yml`, `opencode-triage.yml` и `opencode-scheduled.yml` работают без Render. Локально `OPENCODE_CONFIG` нужен, только если хочешь Render MCP в своём opencode (например, `export OPENCODE_CONFIG=$PWD/opencode.render.json` в `.envrc`; файл **не коммитится**). Для `scripts/deploy.mjs` достаточно `RENDER_API_KEY=rnd_…` в окружении.
 - Формат: серверы лежат прямо под `mcp` (`"mcp": { "<имя>": { … } }`), без уровня `servers`.
 
 ## Стиль кода
