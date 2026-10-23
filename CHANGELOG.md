@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.2](https://github.com/sv99/ai-for-developers-project-387/compare/v1.8.1...v1.8.2) (2026-10-23)
+
+
+### Bug Fixes
+
+* Render-сервис calendar-slot2 и RENDER_API_KEY только для деплоя ([cb9ecb8](https://github.com/sv99/ai-for-developers-project-387/commit/cb9ecb8ea340f996d6d3e617675ef7134af2cfdb))
+
 ## [1.8.1](https://github.com/sv99/ai-for-developers-project-387/compare/v1.8.0...v1.8.1) (2026-10-23)
 
 
