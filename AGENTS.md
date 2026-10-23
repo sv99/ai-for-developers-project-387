@@ -51,6 +51,10 @@ Render деплоит сам: после пуша в main, когда прове
 - `ci.yml` (push в main + PR): `pnpm test` → `pnpm build` → smoke-тест: `pnpm preview` на порту 4173, проверяется `id="app"` в HTML. **Не убирай `<div id="app">` из `index.html`** — упадёт smoke-тест.
 - `hexlet-check.yml` — сгенерирован Хекслетом: **не удалять, не переименовывать, не редактировать** (и не переименовывать репозиторий).
 
+## opencode в GitHub Actions
+
+- Публичных сессий нет: `share` в экшене opencode устарел и игнорируется (sharing discontinued). Не добавляй `share` в воркфлоу. Ссылка в ответе агента — на запуск в Actions; логи публичные, как и репозиторий.
+
 ## Коммиты и PR
 
 - Сообщения коммитов и заголовки PR — строго **Conventional Commits**: `<type>: <описание>`, тип из `feat`, `fix`, `docs`, `ci`, `chore`, `refactor`, `test`, `style`, `perf`, `build`; описание на русском, заголовок короче 72 символов. Без префикса release-please не увидит изменение. Спецификация: https://www.conventionalcommits.org/ru/v1.0.0/
