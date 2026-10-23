@@ -137,7 +137,7 @@ render.yaml
 
 Защита от петель: opencode-воркфлоу не реагируют на события от ботов (`user.type == 'Bot'`), поэтому агент не запускает сам себя — на свои комментарии, issues и PR (`opencode-review.yml` скипает бот-PR).
 
-Секреты: `RELEASE_PLEASE_TOKEN` — релизы; `OPENCODE_API_KEY` и `RENDER_API_KEY` — воркфлоу с агентом.
+Секреты: `RELEASE_PLEASE_TOKEN` — релизы; `OPENCODE_API_KEY` — воркфлоу с агентом; `RENDER_API_KEY` — только `opencode.yml` (деплой по `/oc`), в остальных opencode-воркфлоу Render MCP вырезается из `opencode.json` шагом `jq`.
 
 Ручной запуск scheduled-воркфлоу для теста:
 
