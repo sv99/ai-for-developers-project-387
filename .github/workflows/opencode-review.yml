@@ -13,7 +13,6 @@ jobs:
     if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') && !endsWith(github.actor, '[bot]') }}
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
       # Права на запись комментариев ревью в PR — их публикует GITHUB_TOKEN (use_github_token).
       pull-requests: write
