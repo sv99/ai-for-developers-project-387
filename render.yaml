@@ -2,7 +2,7 @@
 # Dashboard → New → Blueprint → select this repository.
 services:
   - type: web
-    name: calendar-slot
+    name: calendar-slot2
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free

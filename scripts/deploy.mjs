@@ -7,7 +7,7 @@
 // Environment:
 //   RENDER_API_KEY       required — create one at https://dashboard.render.com/u/settings?add-api-key
 //   RENDER_SERVICE_ID    optional — service id (srv-...); skips the lookup by name
-//   RENDER_SERVICE_NAME  optional — service name to look up (default: calendar-slot)
+//   RENDER_SERVICE_NAME  optional — service name to look up (default: calendar-slot2)
 //
 // Before triggering, the script checks that the service is connected to the repo of
 // this checkout (git remote origin). A mismatch aborts the deploy: a service pointed
@@ -19,7 +19,7 @@
 import { spawnSync } from 'node:child_process'
 
 const API = 'https://api.render.com/v1'
-const DEFAULT_SERVICE_NAME = 'calendar-slot'
+const DEFAULT_SERVICE_NAME = 'calendar-slot2'
 const POLL_INTERVAL_MS = 5000
 
 const TERMINAL_SUCCESS = new Set(['live'])
