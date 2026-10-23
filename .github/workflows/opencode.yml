@@ -33,5 +33,7 @@ jobs:
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          # Render MCP подключается отдельным конфигом: остальным воркфлоу он не нужен.
+          OPENCODE_CONFIG: ${{ github.workspace }}/opencode.render.json
         with:
           model: opencode/glm-5.3-flash
