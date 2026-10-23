@@ -82,31 +82,13 @@ pnpx skills update
 Спецификация сгенерировал по уже готовому API слою.
 К его качеству есть вопросы. Пока не понятно как это должно (желательно) работать.
 
-## Deploy в Render
-
-Установка MCP и деплой приложения [calendar-slot2](https://calendar-slot2.onrender.com/).
-
-Ключ RENDER_API_KEY храним в переменных окружения.
-
-После того, как сделал DockerFile начали штатно отрабатываться проверки от hexlet_check.
-
-Используемые конфигурационные файлы:
-
-```bash
-# RENDER_API_KEY - локально в переменных окружения, в CI не нужен
-# Render MCP для локального opencode; подключается через OPENCODE_CONFIG=$PWD/opencode.render.json
-opencode.render.json
-Dockerfile
-nginx.conf.template
-# используется для настройки сервиса в Render
-render.yaml
-```
-
 ## OpenCode Github App
 
 [OpenCode Agent GitHub App](https://github.com/apps/opencode-agent) - установил для текущего репо.
 
 При наличии приложения действия агента отображаются от имени приложения - сразу видно, что коммит сделал именно агент.
+
+С приложением метка автора меняется на `opencode-agent[bot]`. Без приложения (если экшен запущен с `use_github_token: true`) автором был бы общий `github-actions[bot]`, и действия агента не отличить от других воркфлоу. Поэтому все opencode-воркфлоу работают через токен приложения (`id-token: write`). Исключение — issue-отчёт еженедельной проверки: его публикует шаг воркфлоу через `GITHUB_TOKEN`, автор — `github-actions[bot]`.
 
 ```bash
 .github/workflows/opencode.yml
@@ -156,6 +138,36 @@ render.yaml
 ```bash
 gh workflow run "Scheduled OpenCode Task" --ref main
 ```
+
+## Deploy в Render
+
+Приложение: [calendar-slot2](https://calendar-slot2.onrender.com/) (Render Web Service, Docker).
+
+Деплой **автоматический, на стороне Render**: после пуша в `main` Render ждёт, пока пройдут все проверки GitHub (CI, hexlet-check), и сам собирает и выкладывает новую версию (`autoDeployTrigger: checksPass` в `render.yaml` и в настройках сервиса). Воркфлоу деплоя в GitHub Actions нет, секрет `RENDER_API_KEY` в CI не нужен. Если проверки на коммите упали, деплоя не будет.
+
+Статус и время деплоя — в Render Dashboard, вкладка **Events** сервиса `calendar-slot2`.
+
+После того, как сделал DockerFile начали штатно отрабатываться проверки от hexlet_check.
+
+Используемые конфигурационные файлы:
+
+```bash
+Dockerfile
+nginx.conf.template
+# используется для настройки сервиса в Render (Blueprint)
+render.yaml
+# Render MCP для локального opencode; подключается через OPENCODE_CONFIG=$PWD/opencode.render.json
+opencode.render.json
+```
+
+Ручной деплой (например, перевыкатить без нового коммита или со сбросом кэша сборки) — локально, ключ `RENDER_API_KEY` берётся из переменных окружения:
+
+```bash
+pnpm deploy:render                  # задеплоить текущий main
+pnpm deploy:render --clear-cache    # то же со сбросом кэша сборки
+```
+
+Скрипт `scripts/deploy.mjs` проверяет, что сервис подключён к этому репозиторию, запускает деплой и ждёт его завершения.
 
 ## Что дальше
 
