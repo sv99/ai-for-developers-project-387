@@ -24,7 +24,7 @@
 `opencode.json` (в корне, **коммитится**) описывает два MCP-сервера:
 
 - `playwright` — локальный, только для этого проекта;
-- `render` — remote (`https://mcp.render.com/mcp`), ключ подставляется из переменной окружения `RENDER_API_KEY` через `{env:…}`. На новой машине задай `RENDER_API_KEY=rnd_…` (например, в `.envrc` для direnv; файл **не коммитится**), иначе Render MCP вернёт `unauthorized`. Тот же ключ читает `scripts/deploy.mjs` из `RENDER_API_KEY`. В CI (`opencode.yml`) Render MCP отключается шагом `jq`, поэтому секрет там не нужен.
+- `render` — remote (`https://mcp.render.com/mcp`), ключ подставляется из переменной окружения `RENDER_API_KEY` через `{env:…}`. На новой машине задай `RENDER_API_KEY=rnd_…` (например, в `.envrc` для direnv; файл **не коммитится**), иначе Render MCP вернёт `unauthorized`. Тот же ключ читает `scripts/deploy.mjs` из `RENDER_API_KEY`. В CI ключ передаётся только в `opencode.yml` (команды `/oc` с деплоем); в остальных opencode-воркфлоу (`opencode-review.yml`, `opencode-triage.yml`, `opencode-scheduled.yml`) Render MCP вырезается шагом `jq` перед запуском агента, и секрет туда не передаётся.
 
 ## Стиль кода
 
@@ -48,7 +48,8 @@
 
 ## Релизы (release-please)
 
-- Пуш в main запускает `release-please.yml` — по **Conventional Commits** (`feat:`, `fix:` …) создаёт release-PR и тег `v*.*.*`.
+- Коммиты, заголовки PR и summary изменений — в формате **Conventional Commits** (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:` …). Заголовок держи короче 72 символов. Спецификация: https://www.conventionalcommits.org/ru/v1.0.0/
+- Пуш в main запускает `release-please.yml` — по **Conventional Commits** (`feat:`, `fix:` …) создаёт release-PR и тег `v*.*.*`. Коммиты и заголовки PR без префикса release-please не видит и в changelog не включает.
 - Версию в `package.json` поднимает release-please — **не бампай вручную**. `release.yml` сверяет версию пакета с тегом и заливает `dist-<tag>.zip` в GitHub Release.
 - Для release-please нужен секрет `RELEASE_PLEASE_TOKEN` (fine-grained PAT): релиз/тег от обычного `GITHUB_TOKEN` не запустит `release.yml`.
 
