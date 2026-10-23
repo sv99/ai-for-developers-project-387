@@ -13,10 +13,10 @@ jobs:
     if: github.event.issue.user.type != 'Bot'
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
       pull-requests: read
-      issues: read
+      # GITHUB_TOKEN (use_github_token) пишет комментарий агента в issue.
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -24,12 +24,17 @@ jobs:
           persist-credentials: false
 
       - name: Run opencode
-        uses: anomalyco/opencode/github@latest
+        # Пин к SHA вместо @latest, как в opencode-review.yml: у job есть права на запись.
+        # SHA = тег v1.19.4 репозитория anomalyco/opencode.
+        uses: anomalyco/opencode/github@148842ef7cb1bc34192b3fff57d0f9721ab9c801
         # if: steps.check.outputs.result == 'true'
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: opencode/glm-5.3-flash
+          # Токен воркфлоу вместо токена GitHub App, полученного через OIDC.
+          use_github_token: true
           prompt: |
             Review this issue. If there's a clear fix or relevant docs:
             - Provide documentation links

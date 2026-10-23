@@ -53,6 +53,7 @@ Render деплоит сам: после пуша в main, когда прове
 
 ## opencode в GitHub Actions
 
+- Токены: `opencode-review.yml`, `opencode-triage.yml`, `opencode-scheduled.yml` работают с `GITHUB_TOKEN` (`use_github_token: true`, без `id-token`), их комментарии и issues — от `github-actions[bot]`. `opencode.yml` (`/oc`) остаётся на токене GitHub App через OIDC (`id-token: write`): агент там пушит ветки и создаёт PR, а пуши и PR от `GITHUB_TOKEN` не запускают CI.
 - Публичных сессий нет: `share` в экшене opencode устарел и игнорируется (sharing discontinued). Не добавляй `share` в воркфлоу. Ссылка в ответе агента — на запуск в Actions; логи публичные, как и репозиторий.
 
 ## Коммиты и PR
