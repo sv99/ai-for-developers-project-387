@@ -126,16 +126,16 @@ render.yaml
 
 | Файл | Что делает | Когда запускается |
 | --- | --- | --- |
-| `ci.yml` | Линтеры (`pnpm lint:ci` — без `--fix`, предупреждения = ошибка), тесты, сборка и smoke-тест (`<div id="app">` в HTML) | push в любую ветку, PR |
-| `hexlet-check.yml` | Проверки Хекслета. Сгенерирован автоматически — не редактировать | push |
-| `release-please.yml` | Ведёт релизный PR по Conventional Commits (`feat:`/`fix:`), поднимает версию в `package.json` и `.release-please-manifest.json` | push в main |
-| `release.yml` | По тегу `v*.*.*` собирает и прикрепляет `dist-<тег>.zip` к релизу | пуш тега |
-| `opencode.yml` | Агент реагирует на команды `/oc`, `/opencode` в комментариях к issues и PR | комментарий к issue, комментарий к diff (только после Submit ревью) |
-| `opencode-triage.yml` | Агент разбирает новый issue и оставляет комментарий с разбором | создание issue |
+| `ci.yml` | Два параллельных job: **Lint** (`pnpm lint:ci` — без `--fix`, предупреждения = ошибка) и **Smoke test** (тесты, сборка, `pnpm preview` и проверка `<div id="app">` в HTML) | push в любую ветку, PR |
+| `hexlet-check.yml` | Проверки Хекслета. Сгенерирован автоматически — не редактировать | push в любую ветку и тег |
+| `release-please.yml` | Ведёт релизный PR по Conventional Commits (`feat:`/`fix:`), поднимает версию в `package.json` и `.release-please-manifest.json`; после мержа релизного PR создаёт тег и GitHub Release | push в main |
+| `release.yml` | Тесты, проверка «версия в `package.json` = тег», сборка, smoke-тест; прикрепляет `dist-<тег>.zip` к релизу | пуш тега `v*.*.*` |
+| `opencode.yml` | Агент выполняет команды `/oc`, `/opencode` из комментариев: отвечает, правит код, пушит в ветку PR или открывает PR | комментарий к issue или PR, комментарий к строке diff (только после Submit ревью) |
+| `opencode-triage.yml` | Агент разбирает новый issue и оставляет комментарий с разбором | создание issue, вручную |
 | `opencode-review.yml` | Агент ревьюит PR: баги, риски, читабельность | PR открыт, новый пуш, reopen, готов к ревью |
 | `opencode-scheduled.yml` | Агент ищет TODO/FIXME в коде и пишет отчёт в `.opencode-report/todo-report.md`; отчёт попадает в Job Summary, артефакт `todo-report` и issue с меткой `todo-report` (создаётся или дополняется комментарием) | каждый понедельник 9:00 UTC, вручную |
 
-Защита от петель: opencode-воркфлоу не реагируют на события от ботов (`user.type == 'Bot'`), поэтому агент не запускает сам себя — на свои комментарии, issues и PR (`opencode-review.yml` скипает бот-PR).
+Защита от петель: opencode-воркфлоу не реагируют на события от ботов (`user.type == 'Bot'`), поэтому агент не запускает сам себя — на свои комментарии, issues и PR. `opencode-review.yml` пропускает и PR от ботов, и пуши бота в PR человека (`github.actor`). Issue-отчёт scheduled создаётся через `GITHUB_TOKEN`, а такие события воркфлоу не запускают.
 
 Доступ: агент запускается только на команды, issues и PR от участников репозитория (`author_association` — `OWNER`, `MEMBER` или `COLLABORATOR`). Посторонние в публичном репо не тратят `OPENCODE_API_KEY`, их события дают `skipped`.
 
@@ -145,7 +145,9 @@ render.yaml
 - Ответ агента заканчивается ссылкой `[github run]` на запуск в Actions. Репозиторий публичный — лог с ходом работы агента виден всем, поэтому секреты агенту в комментариях не передавать.
 - Старые ссылки `opencode.ai/s/…` в комментариях до 12.10.2026 больше не открываются.
 
-Секреты: `RELEASE_PLEASE_TOKEN` — релизы; `OPENCODE_API_KEY` — воркфлоу с агентом; `RENDER_API_KEY` в CI не нужен: Render деплоит сам после пуша в main, когда проверки прошли (`autoDeployTrigger: checksPass`).
+Токены агента: все opencode-воркфлоу работают с токеном GitHub App через OIDC (`id-token: write`), поэтому ответы агента — от `opencode-agent[bot]`. Исключение — шаг публикации отчёта в `opencode-scheduled.yml`: он пишет issue через `GITHUB_TOKEN` от `github-actions[bot]`. Версия экшена: все четыре opencode-воркфлоу закреплены на одном SHA коммита (тег `v1.19.4` репозитория `anomalyco/opencode`), а не на `@latest`, — новый релиз не меняет поведение агента сам. Обновление — заменить SHA во всех четырёх файлах одним PR.
+
+Секреты: `HEXLET_ID` — проверки Хекслета; `RELEASE_PLEASE_TOKEN` — релизы; `OPENCODE_API_KEY` — воркфлоу с агентом; `RENDER_API_KEY` в CI не нужен: Render деплоит сам после пуша в main, когда проверки прошли (`autoDeployTrigger: checksPass`).
 
 Ручной запуск scheduled-воркфлоу для теста:
 
