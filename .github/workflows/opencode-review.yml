@@ -7,8 +7,10 @@ on:
 jobs:
   opencode-review:
     # Включаем проверку так, чтобы бот реагировал на код человека.
-    # PR от bot-аккаунтов пропускаем.
-    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') }}
+    # PR от bot-аккаунтов пропускаем, как и пуши бота в PR человека (например, `/oc`
+    # смержил main в ветку): экшен проверяет права того, кто запустил событие,
+    # а у opencode-agent[bot] нет write-доступа — ревью падает.
+    if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') && !endsWith(github.actor, '[bot]') }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -20,16 +22,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: false
-
-      # RENDER_API_KEY в этот воркфлоу не передаётся: без вырезания Render MCP
-      # opencode.json невалиден и агент не стартует. skip-worktree скрывает правку
-      # от git, иначе opencode-экшен закоммитит её в свой PR.
-      - name: Drop Render MCP
-        run: |
-          jq 'del(.mcp.servers.render)' opencode.json > opencode.tmp.json
-          jq empty opencode.tmp.json
-          mv opencode.tmp.json opencode.json
-          git update-index --skip-worktree opencode.json
 
       - name: Run opencode review
         uses: anomalyco/opencode/github@latest

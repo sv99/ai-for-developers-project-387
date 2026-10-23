@@ -21,10 +21,15 @@
 
 ## MCP-серверы
 
-`opencode.json` (в корне, **коммитится**) описывает два MCP-сервера:
+Два MCP-сервера в двух конфигах (в корне, оба **коммитятся**):
 
-- `playwright` — локальный, только для этого проекта;
-- `render` — remote (`https://mcp.render.com/mcp`), ключ подставляется из переменной окружения `RENDER_API_KEY` через `{env:…}`. На новой машине задай `RENDER_API_KEY=rnd_…` (например, в `.envrc` для direnv; файл **не коммитится**), иначе Render MCP вернёт `unauthorized`. Тот же ключ читает `scripts/deploy.mjs` из `RENDER_API_KEY`. В CI ключ передаётся только в `opencode.yml` (команды `/oc` с деплоем); в остальных opencode-воркфлоу (`opencode-review.yml`, `opencode-triage.yml`, `opencode-scheduled.yml`) Render MCP вырезается шагом `jq` перед запуском агента, и секрет туда не передаётся.
+- `opencode.json` — `playwright`, локальный, только для этого проекта; грузится всегда;
+- `opencode.render.json` — `render`, remote (`https://mcp.render.com/mcp`), ключ подставляется из переменной окружения `RENDER_API_KEY` через `{env:…}`. Только для локальной работы: подключается переменной `OPENCODE_CONFIG` (абсолютный путь, например `export OPENCODE_CONFIG=$PWD/opencode.render.json` в `.envrc`; файл **не коммитится**), opencode сливает его с `opencode.json`. В CI Render MCP и `RENDER_API_KEY` не используются. Для `scripts/deploy.mjs` достаточно `RENDER_API_KEY=rnd_…` в окружении.
+- Формат: серверы лежат прямо под `mcp` (`"mcp": { "<имя>": { … } }`), без уровня `servers`.
+
+## Деплой
+
+Render деплоит сам: после пуша в main, когда проверки GitHub (CI) прошли (`autoDeployTrigger: checksPass` в `render.yaml` и в настройках сервиса `calendar-slot2`). Воркфлоу деплоя нет. Ручной деплой — `pnpm deploy:render` локально.
 
 ## Стиль кода
 
@@ -46,10 +51,14 @@
 - `ci.yml` (push в main + PR): `pnpm test` → `pnpm build` → smoke-тест: `pnpm preview` на порту 4173, проверяется `id="app"` в HTML. **Не убирай `<div id="app">` из `index.html`** — упадёт smoke-тест.
 - `hexlet-check.yml` — сгенерирован Хекслетом: **не удалять, не переименовывать, не редактировать** (и не переименовывать репозиторий).
 
+## Коммиты и PR
+
+- Сообщения коммитов и заголовки PR — строго **Conventional Commits**: `<type>: <описание>`, тип из `feat`, `fix`, `docs`, `ci`, `chore`, `refactor`, `test`, `style`, `perf`, `build`; описание на русском, заголовок короче 72 символов. Без префикса release-please не увидит изменение. Спецификация: https://www.conventionalcommits.org/ru/v1.0.0/
+- Агент в GitHub (opencode): когда просят кратко резюмировать сделанные изменения (summary), ответ — тоже в этом формате, например `fix: тост ElMessage.error при занятом слоте`. Этот summary экшен использует как сообщение коммита и заголовок PR.
+
 ## Релизы (release-please)
 
-- Коммиты, заголовки PR и summary изменений — в формате **Conventional Commits** (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:` …). Заголовок держи короче 72 символов. Спецификация: https://www.conventionalcommits.org/ru/v1.0.0/
-- Пуш в main запускает `release-please.yml` — по **Conventional Commits** (`feat:`, `fix:` …) создаёт release-PR и тег `v*.*.*`. Коммиты и заголовки PR без префикса release-please не видит и в changelog не включает.
+- Пуш в main запускает `release-please.yml` — по **Conventional Commits** (`feat:`, `fix:` …) создаёт release-PR и тег `v*.*.*`.
 - Версию в `package.json` поднимает release-please — **не бампай вручную**. `release.yml` сверяет версию пакета с тегом и заливает `dist-<tag>.zip` в GitHub Release.
 - Для release-please нужен секрет `RELEASE_PLEASE_TOKEN` (fine-grained PAT): релиз/тег от обычного `GITHUB_TOKEN` не запустит `release.yml`.
 

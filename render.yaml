@@ -7,4 +7,5 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     healthCheckPath: /
-    autoDeploy: true
+    # Deploy on push to main, but only after GitHub checks (CI) pass.
+    autoDeployTrigger: checksPass

@@ -93,9 +93,9 @@ pnpx skills update
 Используемые конфигурационные файлы:
 
 ```bash
-# RENDER_API_KEY - локально в переменных окружения
-# CI - ключи из secrets.RENDER_API_KEY
-opencode.json
+# RENDER_API_KEY - локально в переменных окружения, в CI не нужен
+# Render MCP для локального opencode; подключается через OPENCODE_CONFIG=$PWD/opencode.render.json
+opencode.render.json
 Dockerfile
 nginx.conf.template
 # используется для настройки сервиса в Render
@@ -137,7 +137,7 @@ render.yaml
 
 Защита от петель: opencode-воркфлоу не реагируют на события от ботов (`user.type == 'Bot'`), поэтому агент не запускает сам себя — на свои комментарии, issues и PR (`opencode-review.yml` скипает бот-PR).
 
-Секреты: `RELEASE_PLEASE_TOKEN` — релизы; `OPENCODE_API_KEY` и `RENDER_API_KEY` — воркфлоу с агентом.
+Секреты: `RELEASE_PLEASE_TOKEN` — релизы; `OPENCODE_API_KEY` — воркфлоу с агентом; `RENDER_API_KEY` в CI не нужен: Render деплоит сам после пуша в main, когда проверки прошли (`autoDeployTrigger: checksPass`).
 
 Ручной запуск scheduled-воркфлоу для теста:
 
