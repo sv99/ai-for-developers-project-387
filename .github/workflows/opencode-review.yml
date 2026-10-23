@@ -30,7 +30,8 @@ jobs:
           persist-credentials: false
 
       - name: Run opencode review
-        # Пин к SHA вместо @latest: новый релиз экшена не сменит поведение молча.
+        # Пин к SHA вместо @latest фиксирует обёртку экшена (action.yml). Сам opencode CLI
+        # экшен всё равно ставит последней версии (curl … | bash без версии).
         # SHA = тег v1.19.4 репозитория anomalyco/opencode.
         uses: anomalyco/opencode/github@148842ef7cb1bc34192b3fff57d0f9721ab9c801
         env:
