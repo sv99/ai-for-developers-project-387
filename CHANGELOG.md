@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.1](https://github.com/sv99/ai-for-developers-project-387/compare/v1.8.0...v1.8.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* render service name, CI secrets ([1fec711](https://github.com/sv99/ai-for-developers-project-387/commit/1fec7118cc5c9503f2340e087ee5e964016eece1))
+* render service name, CI secrets ([fc79afd](https://github.com/sv99/ai-for-developers-project-387/commit/fc79afdf5535e257ed6335bb72c30bb3ee45fa70))
+
 ## [1.8.0](https://github.com/sv99/ai-for-developers-project-387/compare/v1.7.1...v1.8.0) (2026-10-12)
 
 
