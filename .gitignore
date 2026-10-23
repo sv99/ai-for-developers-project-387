@@ -50,3 +50,6 @@ tsp-output/
 
 # Claude Code (локальные симлинки на .agents/skills)
 .claude/
+
+# Отчёт еженедельной проверки opencode (артефакт CI, не коммитится)
+.opencode-report/

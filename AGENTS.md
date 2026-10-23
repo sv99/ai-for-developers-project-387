@@ -54,6 +54,7 @@ Render деплоит сам: после пуша в main, когда прове
 ## opencode в GitHub Actions
 
 - Запуск только от участников: `opencode.yml`, `opencode-triage.yml`, `opencode-review.yml` проверяют `author_association` ∈ `OWNER`/`MEMBER`/`COLLABORATOR` в `if:` job. Не ослабляй это условие: репозиторий публичный.
+- Еженедельная проверка (`opencode-scheduled.yml`): агент обязан записать отчёт в `.opencode-report/todo-report.md` (папка в `.gitignore`: изменения в рабочей копии экшен превратил бы в PR). Публикуют отчёт шаги воркфлоу: Job Summary, артефакт `todo-report`, issue с меткой `todo-report` от `github-actions[bot]`. Нет отчёта — job падает.
 - Публичных сессий нет: `share` в экшене opencode устарел и игнорируется (sharing discontinued). Не добавляй `share` в воркфлоу. Ссылка в ответе агента — на запуск в Actions; логи публичные, как и репозиторий.
 
 ## Коммиты и PR

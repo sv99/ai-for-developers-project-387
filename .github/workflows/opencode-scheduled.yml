@@ -9,10 +9,16 @@ jobs:
   opencode:
     runs-on: ubuntu-latest
     permissions:
+      # OIDC-токен экшен обменивает на токен GitHub App (opencode-agent[bot]).
       id-token: write
-      contents: read
-      pull-requests: read
-      issues: read
+      contents: write
+      pull-requests: write
+      # GITHUB_TOKEN шага «Publish report issue» создаёт issue и комментирует его.
+      issues: write
+    env:
+      # Обязательное место отчёта. Папка в .gitignore: иначе экшен увидит изменения
+      # в рабочей копии и сам откроет PR с отчётом.
+      REPORT: .opencode-report/todo-report.md
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -20,11 +26,56 @@ jobs:
           persist-credentials: false
 
       - name: Run opencode
-        uses: anomalyco/opencode/github@latest
+        # Пин к SHA вместо @latest: новый релиз экшена не сменит поведение молча.
+        # SHA = тег v1.19.4 репозитория anomalyco/opencode.
+        uses: anomalyco/opencode/github@148842ef7cb1bc34192b3fff57d0f9721ab9c801
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
         with:
           model: opencode/glm-5.3-flash
           prompt: |
-            Review the codebase for any TODO comments and create a summary.
-            If you find issues worth addressing, open an issue to track them.
+            Найди в отслеживаемых git файлах комментарии TODO, FIXME, HACK и XXX
+            (используй `git grep -n -E 'TODO|FIXME|HACK|XXX'`; пропускай CHANGELOG.md,
+            pnpm-lock.yaml и сгенерированные auto-imports.d.ts, components.d.ts, docs/openapi.yaml).
+
+            Обязательно запиши отчёт на русском в файл .opencode-report/todo-report.md
+            (создай папку), даже если ничего не найдено. Формат:
+            - заголовок `## Отчёт TODO` и одна строка-итог (сколько найдено);
+            - таблица `| Файл:строка | Тип | Текст | Что сделать |`;
+            - раздел `### Стоит завести задачи` — пункты, которые стоит взять в работу, или «нет».
+
+            Ничего не меняй в отслеживаемых файлах, не создавай ветки, коммиты, PR и issues:
+            отчёт публикуют следующие шаги воркфлоу.
+
+      - name: Job summary
+        if: always()
+        run: |
+          if [ ! -s "$REPORT" ]; then
+            echo "::error::Агент не записал отчёт в $REPORT"
+            exit 1
+          fi
+          cat "$REPORT" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: todo-report
+          path: ${{ env.REPORT }}
+          if-no-files-found: error
+
+      - name: Publish report issue
+        # Одно открытое issue с меткой todo-report: создаём его или добавляем комментарий.
+        # Issue от GITHUB_TOKEN не запускает триаж и другие воркфлоу.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          printf '\n\n[github run](%s)\n' "$RUN_URL" >> "$REPORT"
+          issue=$(gh issue list --label todo-report --state open --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --body-file "$REPORT"
+          else
+            gh label create todo-report --color FBCA04 --description 'Еженедельный отчёт opencode по TODO' --force
+            gh issue create --title 'Еженедельный отчёт TODO' --label todo-report --body-file "$REPORT"
+          fi

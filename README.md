@@ -133,7 +133,7 @@ render.yaml
 | `opencode.yml` | Агент реагирует на команды `/oc`, `/opencode` в комментариях к issues и PR | комментарий к issue, комментарий к diff (только после Submit ревью) |
 | `opencode-triage.yml` | Агент разбирает новый issue и оставляет комментарий с разбором | создание issue |
 | `opencode-review.yml` | Агент ревьюит PR: баги, риски, читабельность | PR открыт, новый пуш, reopen, готов к ревью |
-| `opencode-scheduled.yml` | Агент ищет TODO-комментарии в коде и заводит issues по находкам | каждый понедельник 9:00 UTC, вручную |
+| `opencode-scheduled.yml` | Агент ищет TODO/FIXME в коде и пишет отчёт в `.opencode-report/todo-report.md`; отчёт попадает в Job Summary, артефакт `todo-report` и issue с меткой `todo-report` (создаётся или дополняется комментарием) | каждый понедельник 9:00 UTC, вручную |
 
 Защита от петель: opencode-воркфлоу не реагируют на события от ботов (`user.type == 'Bot'`), поэтому агент не запускает сам себя — на свои комментарии, issues и PR (`opencode-review.yml` скипает бот-PR).
 
