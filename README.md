@@ -84,7 +84,7 @@ pnpx skills update
 
 ## Deploy в Render
 
-Установка MCP и деплой приложения [calendar-slot](https://calendar-slot.onrender.com/).
+Установка MCP и деплой приложения [calendar-slot2](https://calendar-slot2.onrender.com/).
 
 Ключ RENDER_API_KEY храним в переменных окружения.
 
