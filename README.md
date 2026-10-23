@@ -126,7 +126,7 @@ render.yaml
 
 | Файл | Что делает | Когда запускается |
 | --- | --- | --- |
-| `ci.yml` | Тесты, сборка и smoke-тест (`<div id="app">` в HTML) | push в любую ветку, PR |
+| `ci.yml` | Линтеры (oxlint, ESLint без `--fix`, предупреждения = ошибка), тесты, сборка и smoke-тест (`<div id="app">` в HTML) | push в любую ветку, PR |
 | `hexlet-check.yml` | Проверки Хекслета. Сгенерирован автоматически — не редактировать | push |
 | `release-please.yml` | Ведёт релизный PR по Conventional Commits (`feat:`/`fix:`), поднимает версию в `package.json` и `.release-please-manifest.json` | push в main |
 | `release.yml` | По тегу `v*.*.*` собирает и прикрепляет `dist-<тег>.zip` к релизу | пуш тега |

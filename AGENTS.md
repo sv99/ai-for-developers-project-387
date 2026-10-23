@@ -49,6 +49,7 @@ Render деплоит сам: после пуша в main, когда прове
 ## CI (не ломать)
 
 - `ci.yml` (push в main + PR): `pnpm test` → `pnpm build` → smoke-тест: `pnpm preview` на порту 4173, проверяется `id="app"` в HTML. **Не убирай `<div id="app">` из `index.html`** — упадёт smoke-тест.
+- `ci.yml`, job `Lint`: `oxlint . --deny-warnings` и `eslint . --max-warnings=0` **без `--fix`** (в отличие от `pnpm lint`). Перед пушем прогоняй `pnpm lint`: любое предупреждение валит CI.
 - `hexlet-check.yml` — сгенерирован Хекслетом: **не удалять, не переименовывать, не редактировать** (и не переименовывать репозиторий).
 
 ## opencode в GitHub Actions
