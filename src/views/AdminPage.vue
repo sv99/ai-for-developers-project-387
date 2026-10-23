@@ -58,7 +58,6 @@ const onAddType = async () => {
   if (!valid || !typeForm.durationMinutes) {
     return
   }
-  // TODO: тестовый маркер для проверки opencode-scheduled.yml, удалить перед мержем
   try {
     createEventType({
       name: typeForm.name,
