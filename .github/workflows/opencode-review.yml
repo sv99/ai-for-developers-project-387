@@ -25,8 +25,10 @@ jobs:
           persist-credentials: false
 
       - name: Run opencode review
-        uses: anomalyco/opencode/github@latest
-        # if: steps.check.outputs.result == 'true'
+        # Пин к SHA вместо @latest: у job есть pull-requests: write, mutable-реф
+        # позволил бы новому релизу экшена молча сменить поведение с этими правами.
+        # SHA = тег v1.19.4 репозитория anomalyco/opencode.
+        uses: anomalyco/opencode/github@148842ef7cb1bc34192b3fff57d0f9721ab9c801
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
