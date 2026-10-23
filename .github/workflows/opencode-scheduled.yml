@@ -25,10 +25,14 @@ jobs:
         with:
           persist-credentials: false
 
+      # Папку создаём сами: отчёт не должен зависеть от того, не забыл ли агент mkdir.
+      - name: Prepare report directory
+        run: mkdir -p "$(dirname "$REPORT")"
+
       - name: Run opencode
-        # Пин к SHA вместо @latest: новый релиз экшена не сменит поведение молча.
-        # SHA = тег v1.19.4 репозитория anomalyco/opencode.
-        uses: anomalyco/opencode/github@148842ef7cb1bc34192b3fff57d0f9721ab9c801
+        # @latest: opencode CLI экшен всё равно ставит последней версии, а пин обёртки
+        # только рассинхронизировал бы её с CLI.
+        uses: anomalyco/opencode/github@latest
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
         with:
@@ -38,8 +42,8 @@ jobs:
             (используй `git grep -n -E 'TODO|FIXME|HACK|XXX'`; пропускай CHANGELOG.md,
             pnpm-lock.yaml и сгенерированные auto-imports.d.ts, components.d.ts, docs/openapi.yaml).
 
-            Обязательно запиши отчёт на русском в файл .opencode-report/todo-report.md
-            (создай папку), даже если ничего не найдено. Формат:
+            Обязательно запиши отчёт на русском в файл ${{ env.REPORT }}
+            (папка уже создана), даже если ничего не найдено. Формат:
             - заголовок `## Отчёт TODO` и одна строка-итог (сколько найдено);
             - таблица `| Файл:строка | Тип | Текст | Что сделать |`;
             - раздел `### Стоит завести задачи` — пункты, которые стоит взять в работу, или «нет».
