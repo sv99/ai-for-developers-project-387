@@ -8,6 +8,7 @@
 - `pnpm test` — все тесты (vitest run); один файл: `pnpm test LandingPage`
 - `pnpm type-check` — `vue-tsc --build` по references из `tsconfig.json`: `tsconfig.app.json`, `tsconfig.node.json`, `tsconfig.vitest.json`
 - `pnpm lint` — сначала `lint:oxlint`, затем `lint:eslint` (последовательно, оба с `--fix`)
+- `pnpm lint:ci` — то же, что гоняет CI: оба линтера **без `--fix`**, предупреждения считаются ошибкой
 - `pnpm format` — `oxfmt src/` (только `src/`, не весь репозиторий)
 - `pnpm build` — параллельно type-check + `vite build`
 - `pnpm tsp:check` — компиляция доменной модели TypeSpec (`typespec/main.tsp`) без эмита
@@ -49,6 +50,7 @@ Render деплоит сам: после пуша в main, когда прове
 ## CI (не ломать)
 
 - `ci.yml` (push в main + PR): `pnpm test` → `pnpm build` → smoke-тест: `pnpm preview` на порту 4173, проверяется `id="app"` в HTML. **Не убирай `<div id="app">` из `index.html`** — упадёт smoke-тест.
+- `ci.yml`, job `Lint`: `pnpm lint:ci` — оба линтера **без `--fix`** (в отличие от `pnpm lint`), предупреждение = ошибка. Перед пушем прогоняй `pnpm lint:ci`: любое предупреждение валит CI.
 - `hexlet-check.yml` — сгенерирован Хекслетом: **не удалять, не переименовывать, не редактировать** (и не переименовывать репозиторий).
 
 ## opencode в GitHub Actions
