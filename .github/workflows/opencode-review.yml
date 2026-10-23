@@ -13,9 +13,10 @@ jobs:
     if: ${{ !endsWith(github.event.pull_request.user.login, '[bot]') && !endsWith(github.actor, '[bot]') }}
     runs-on: ubuntu-latest
     permissions:
+      # OIDC-токен экшен обменивает на токен GitHub App: ревью пишет opencode-agent[bot].
+      id-token: write
       contents: read
-      # Права на запись комментариев ревью в PR — их публикует GITHUB_TOKEN (use_github_token).
-      pull-requests: write
+      pull-requests: read
       issues: read
     steps:
       - name: Checkout repository
@@ -24,17 +25,13 @@ jobs:
           persist-credentials: false
 
       - name: Run opencode review
-        # Пин к SHA вместо @latest: у job есть pull-requests: write, mutable-реф
-        # позволил бы новому релизу экшена молча сменить поведение с этими правами.
+        # Пин к SHA вместо @latest: новый релиз экшена не сменит поведение молча.
         # SHA = тег v1.19.4 репозитория anomalyco/opencode.
         uses: anomalyco/opencode/github@148842ef7cb1bc34192b3fff57d0f9721ab9c801
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }} # имя секрета зависит от провайдера в model
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: opencode/glm-5.3-flash
-          # Токен воркфлоу вместо токена GitHub App, полученного через OIDC.
-          use_github_token: true
           prompt: |
             Review this pull request:
             - Find bugs and risky changes
